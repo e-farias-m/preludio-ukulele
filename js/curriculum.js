@@ -18,7 +18,7 @@ const CURRICULUM = {
     { name:'G7', frets:[0,2,1,2], fingers:[null,2,1,3] },
     { name:'Am', frets:[2,0,0,0], fingers:[2,null,null,null] },
     { name:'G', frets:[0,2,3,2], fingers:[null,1,3,2] },
-    { name:'Dm', frets:[2,2,1,0], fingers:[1,3,2,null] },
+    { name:'Dm', frets:[2,2,1,0], fingers:[2,3,1,null] },
     { name:'Em', frets:[0,4,3,2], fingers:[null,3,2,1] },
     { name:'A', frets:[2,1,0,0], fingers:[2,1,null,null] },
     { name:'D', frets:[2,2,2,0], fingers:[1,2,3,null] },
