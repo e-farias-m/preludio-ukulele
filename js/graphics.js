@@ -1,8 +1,8 @@
 (function(){
   'use strict';
   function fretboard(fret, string, note){
-    var nutX=8, fretSpacing=7.2;
-    var stringY=[15,35,55,75];
+    var nutX=31.3, fretSpacing=4.23;
+    var stringY=[61.3,66.8,72.4,77.9];
     var dx = (fret===0) ? nutX : (nutX + fret*fretSpacing - fretSpacing/2);
     var dy = stringY[string] || 50;
     var label = note || '';
