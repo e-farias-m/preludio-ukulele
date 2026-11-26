@@ -29,7 +29,7 @@ function uiKeys() {
 // Strings that are legitimately the same in every language.
 const identity = new Set([
   'XP', 'BPM', '—', 'Frère Jacques', 'La Bamba',
-  'Dm, Em, A, D, D7, A7', 'Tablature', 'Notes',
+  'Dm, Em, A, D, D7, A7', 'Tablature', 'Notes', 'Badges', 'Minutes',
   'Largo', 'Andante', 'Moderato', 'Allegro', 'Presto'
 ]);
 

@@ -206,6 +206,7 @@
     var xp = g.score * 2;
     Progress.addXp(xp);
     g.result = { score: g.score, total: g.total, xp: xp, newBest: newBest };
+    if (window.PreludioHooks && window.PreludioHooks.onGameFinish) window.PreludioHooks.onGameFinish(g.mode);
     render();
   }
 
@@ -660,6 +661,7 @@
   var Practice = {
     renderHub: renderHub,
     renderGame: renderGame,
+    startGame: startGame,
     stopAll: stopAll,
     sync: function () { /* widget state is updated in place by its own engine */ },
     handle: handle

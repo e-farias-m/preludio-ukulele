@@ -4,7 +4,7 @@
 
 'use strict';
 
-var CACHE = 'preludio-ukulele-v3';
+var CACHE = 'preludio-ukulele-v4';
 
 var ASSETS = [
   './',

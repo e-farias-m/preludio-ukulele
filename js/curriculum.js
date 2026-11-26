@@ -232,6 +232,31 @@ const CURRICULUM = {
           description: 'One octave above open C.',
           prompt: 'Press the C string at the 12th fret.' }
       ]
+    },
+    {
+      id: 'favourites',
+      title: 'Favourite tunes',
+      subtitle: 'Well-known songs for the chords you know.',
+      lessons: [
+        { id: 'twinkle', type: 'song', songKind: 'chord', title: 'Twinkle, Twinkle, Little Star',
+          bpm: 88, timeSig: { num: 4, den: 4 },
+          bars: ['C', 'C', 'F', 'C', 'C', 'F', 'C', 'F'],
+          strum: ['D', 'D', 'D', 'D'],
+          description: 'A gentle nursery tune using just C and F.',
+          prompt: 'Two bars of C, then two of F. Keep the strum slow and even.' },
+        { id: 'mary-lamb', type: 'song', songKind: 'chord', title: 'Mary Had a Little Lamb',
+          bpm: 92, timeSig: { num: 4, den: 4 },
+          bars: ['C', 'C', 'F', 'C', 'C', 'F', 'G7', 'C'],
+          strum: ['D', 'D', 'U', 'D'],
+          description: 'A simple melody about a little lamb. Three familiar chords.',
+          prompt: 'Change chords on the first beat of each bar. Keep the pulse steady.' },
+        { id: 'jingle-bells', type: 'song', songKind: 'chord', title: 'Jingle Bells',
+          bpm: 104, timeSig: { num: 4, den: 4 },
+          bars: ['C', 'C', 'F', 'C', 'C', 'C', 'G7', 'C'],
+          strum: ['D', 'D', 'U', 'D'],
+          description: 'A cheerful winter song with a bright, bouncing pulse.',
+          prompt: 'One chord per bar. Let the last strum ring before you change.' }
+      ]
     }
   ]
 };

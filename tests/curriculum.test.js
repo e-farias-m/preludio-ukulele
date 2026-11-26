@@ -3,17 +3,17 @@ const assert = require('node:assert/strict');
 const C = require('../js/curriculum.js');
 
 test('curriculum has a complete, unique lesson path', () => {
-  assert.equal(C.flatLessons.length, 31);
+  assert.equal(C.flatLessons.length, 34);
   const ids = C.flatLessons.map(l => l.id);
   assert.equal(new Set(ids).size, ids.length);
   C.flatLessons.forEach((l, i) => assert.equal(l.index, i));
 });
 
-test('curriculum contains seven interleaved songs', () => {
+test('curriculum contains ten interleaved songs', () => {
   const songs = C.flatLessons.filter(l => l.type === 'song');
-  assert.equal(songs.length, 7);
+  assert.equal(songs.length, 10);
   assert.deepEqual(songs.map(l => l.songKind),
-    ['chord', 'chord', 'chord', 'chord', 'chord', 'chord', 'melody']);
+    ['chord', 'chord', 'chord', 'chord', 'chord', 'chord', 'melody', 'chord', 'chord', 'chord']);
 });
 
 test('chord songs reference known chords and valid strum patterns', () => {

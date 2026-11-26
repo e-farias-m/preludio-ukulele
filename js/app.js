@@ -16,6 +16,8 @@
     lastStars: 0,
     lastXp: 0,
     lastWasFirst: false,
+    tourSlide: 0,
+    showReference: null,
     songSpeed: getSavedSongSpeed(),
     song: {
       active: false,
@@ -122,7 +124,98 @@
     else if (APP.screen === 'settings') app.innerHTML = renderSettings();
     else if (APP.screen === 'hub') app.innerHTML = Practice.renderHub();
     else if (APP.screen === 'game') app.innerHTML = Practice.renderGame();
+    else if (APP.screen === 'report') app.innerHTML = renderReport();
+    else if (APP.screen === 'digest') app.innerHTML = renderDigest();
+    else if (APP.screen === 'song-library') app.innerHTML = renderSongLibrary();
+    else if (APP.screen === 'tour') app.innerHTML = renderTour();
+    if (APP.showReference) app.innerHTML += renderReferenceOverlay();
     if (!keepScroll) window.scrollTo(0, 0);
+  }
+
+  // ── ADAPTIVE PLAN ────────────────────────────────────────────────────
+  function todayKey() {
+    var d = new Date();
+    return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+  }
+  function weakestLesson(type) {
+    var list = flatLessons().filter(function (l) {
+      return l.type === type && Progress.isCompleted(l.id);
+    });
+    if (!list.length) return null;
+    var scored = list.map(function (l) {
+      var key = type === 'chord' ? l.chord : l.id;
+      var skill = Progress.getSkill(key);
+      var acc = skill && skill.total ? skill.correct / skill.total : 0.6;
+      return { lesson: l, acc: acc, total: skill ? skill.total : 0 };
+    });
+    scored.sort(function (a, b) { return a.acc - b.acc || b.total - a.total; });
+    return scored[0].lesson;
+  }
+  function planReason(lesson) {
+    var key = lesson.type === 'chord' ? lesson.chord : lesson.id;
+    var skill = Progress.getSkill(key);
+    var acc = skill && skill.total ? skill.correct / skill.total : 0.6;
+    return acc < 0.7 ? 'Shaky — needs review' : 'Keep it fresh';
+  }
+  function buildPlan() {
+    var items = [];
+    var note = weakestLesson('note');
+    if (note) items.push({ id: 'review-note', kind: 'lesson', ref: note.id, reason: planReason(note), done: false });
+    var chord = weakestLesson('chord');
+    if (chord) items.push({ id: 'review-chord', kind: 'lesson', ref: chord.id, reason: planReason(chord), done: false });
+    if (Progress.getLearnedCount('note') >= 2 || Progress.getLearnedCount('chord') >= 2) {
+      var mode = Progress.getGameBest('note') <= Progress.getGameBest('chord') ? 'note' : 'chord';
+      items.push({ id: 'sprint-' + mode, kind: 'game', ref: mode, reason: 'Build speed', done: false });
+    }
+    var song = flatLessons().filter(function (l) {
+      return l.type === 'song' && !Progress.isCompleted(l.id) && Progress.isUnlocked(l.id);
+    })[0];
+    if (song) items.push({ id: 'song-' + song.id, kind: 'lesson', ref: song.id, reason: 'Apply your notes', done: false });
+    return { date: todayKey(), items: items, bonus: false };
+  }
+  function getPlan() {
+    var plan = Progress.getPlan();
+    if (!plan || plan.date !== todayKey() || !Array.isArray(plan.items)) {
+      plan = buildPlan();
+      Progress.setPlan(plan);
+    }
+    return plan;
+  }
+  function savePlan(plan) { Progress.setPlan(plan); }
+  function markPlanDone(matcher) {
+    var plan = getPlan();
+    var changed = false;
+    plan.items.forEach(function (item) {
+      if (!item.done && matcher(item)) { item.done = true; changed = true; }
+    });
+    if (!changed) return;
+    if (plan.items.every(function (item) { return item.done; }) && !plan.bonus) {
+      plan.bonus = true;
+      Progress.addXp(20);
+      showToast(t('Plan complete!'));
+    }
+    savePlan(plan);
+  }
+  function planLabel(item) {
+    if (item.kind === 'game') return t(item.ref === 'note' ? 'Note sprint' : 'Chord sprint');
+    var lesson = lessonById(item.ref);
+    if (!lesson) return '';
+    if (lesson.type === 'song') return t('Play {name}').replace('{name}', lessonTitle(lesson));
+    return t('Review {name}').replace('{name}', lessonTitle(lesson));
+  }
+  function showToast(message) {
+    var node = document.createElement('div');
+    node.className = 'toast';
+    node.setAttribute('role', 'status');
+    node.textContent = message;
+    document.body.appendChild(node);
+    setTimeout(function () { if (node.parentNode) node.parentNode.removeChild(node); }, 2800);
+  }
+  function announceBadges(ids) {
+    if (!ids || !ids.length) return;
+    setTimeout(function () {
+      showToast(t('Badge earned: {name}').replace('{name}', t(BADGE_LABELS[ids[0]])));
+    }, 350);
   }
 
   // ── MAP ────────────────────────────────────────────────────────────────
@@ -167,6 +260,10 @@
     html += '<div class="stat-card"><div class="stat-value">' + Progress.getStreak() + '</div><div class="stat-label">' + t('Day streak') + '</div></div>';
     html += '</div>';
 
+    html += '<button class="report-open" data-action="open-report">📋 ' + t('Progress report') + '</button>';
+    html += '<button class="report-open" data-action="open-song-library">♫ ' + t('Try a song') + '</button>';
+    html += '<button class="tour-link" data-action="open-tour">' + t('How this app works') + '</button>';
+
     if (!Progress.hasSeenFirstSound()) {
       html += '<button class="first-sound-cta" data-action="open-first-sound">';
       html += '<span class="cta-icon" aria-hidden="true">♪</span>';
@@ -183,6 +280,9 @@
       html += '</button>';
     }
 
+    html += renderDigestCard();
+    html += renderPlanCard();
+
     CURRICULUM.units.forEach(function (unit) {
       var done = unit.lessons.filter(function (l) { return Progress.isCompleted(l.id); }).length;
       var unitPct = Math.round(done / unit.lessons.length * 100);
@@ -196,18 +296,344 @@
         var completedLesson = Progress.isCompleted(lesson.id);
         var stars = Progress.getStars(lesson.id);
         var cls = 'lesson-node' + (unlocked ? '' : ' locked') + (completedLesson ? ' completed' : '');
-        html += '<button class="' + cls + '" data-action="open-lesson" data-id="' + lesson.id + '"' + (unlocked ? '' : ' disabled') + '>';
+        html += '<div class="' + cls + '">';
+        html += '<button class="node-main" data-action="open-lesson" data-id="' + lesson.id + '"' + (unlocked ? '' : ' disabled') + '>';
         html += '<span class="lesson-icon ' + lessonIconClass(lesson) + '">' + esc(lessonIcon(lesson)) + '</span>';
         html += '<span class="node-copy"><span class="node-title">' + esc(lessonTitle(lesson)) + '</span><span class="node-desc">' + esc(t(lesson.description)) + '</span></span>';
         html += '<span class="node-status">' + (unlocked ? (completedLesson ? starsHtml(stars) : '<span class="node-go">›</span>') : lockSvg()) + '</span>';
         html += '</button>';
+        if (unlocked) html += '<button class="node-reference" data-action="open-reference" data-id="' + lesson.id + '" aria-label="' + esc(t('View reference')) + '">👁</button>';
+        html += '</div>';
       });
       html += '</div></section>';
     });
 
-    html += '<footer class="app-footer">Preludio Ukulele · v0.5 · © 2026 Eduardo de Farias Machado. All rights reserved. <a href="LICENSE">Licence</a> · <a href="THIRD_PARTY_NOTICES.md">Third-party notices</a></footer>';
+    html += '<footer class="app-footer">Preludio Ukulele · v0.6 · © 2026 Eduardo de Farias Machado. All rights reserved. <a href="LICENSE">Licence</a> · <a href="THIRD_PARTY_NOTICES.md">Third-party notices</a></footer>';
     html += '</div>';
     return html;
+  }
+
+  // ── SONG LIBRARY ────────────────────────────────────────────────────
+  function renderSongLibrary() {
+    var songs = flatLessons().filter(function (l) { return l.type === 'song'; });
+    var html = '<div class="screen song-lib-screen">';
+    html += '<header class="app-header"><button class="icon-btn" data-action="back-map" aria-label="' + esc(t('Back')) + '">←</button>';
+    html += '<div class="header-title">' + t('Song Library') + '</div><div class="header-spacer"></div></header>';
+    html += '<div class="lesson-body report-body">';
+    html += '<div class="kicker">' + t('Songs') + '</div>';
+    html += '<h1 class="lesson-title">' + t('Song Library') + '</h1>';
+    html += '<p class="lesson-desc">' + t('Pick any song you can play. Songs unlock as you learn new chords and notes.') + '</p>';
+    if (!songs.length) {
+      html += '<p class="report-empty">' + t('No songs yet.') + '</p>';
+    } else {
+      html += '<div class="song-lib-list">';
+      songs.forEach(function (song) {
+        var unlocked = Progress.isUnlocked(song.id);
+        var done = Progress.isCompleted(song.id);
+        var cls = 'song-lib-card' + (unlocked ? '' : ' locked') + (done ? ' done' : '');
+        html += '<div class="' + cls + '">';
+        html += '<div class="song-lib-head"><span class="song-lib-title">♫ ' + esc(lessonTitle(song)) + '</span>';
+        html += done ? starsHtml(Progress.getStars(song.id)) : '';
+        html += '</div>';
+        html += '<div class="song-lib-level">' + esc(t(song.unitTitle)) + '</div>';
+        html += '<p class="song-lib-notes">' + esc(t(song.description)) + '</p>';
+        html += '<div class="song-lib-actions">';
+        html += unlocked
+          ? '<button class="btn secondary btn-small" data-action="open-lesson" data-id="' + song.id + '">' + t('Play') + '</button>'
+          : '<span class="song-lib-lock">🔒 ' + t('Locked') + '</span>';
+        html += '</div></div>';
+      });
+      html += '</div>';
+    }
+    html += '</div></div>';
+    return html;
+  }
+
+  // ── WEEKLY DIGEST ───────────────────────────────────────────────────
+  var DAY_KEYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  var GOAL_OPTIONS = [30, 60, 120, 180];
+
+  function dateKeyFor(date) {
+    return date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
+  }
+  function weekStart() {
+    var d = new Date();
+    var day = (d.getDay() + 6) % 7;
+    d.setDate(d.getDate() - day);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+  function weekDays() {
+    var start = weekStart();
+    var activity = Progress.getActivity();
+    return DAY_KEYS.map(function (label, i) {
+      var d = new Date(start);
+      d.setDate(start.getDate() + i);
+      var key = dateKeyFor(d);
+      return { label: label, key: key, minutes: Math.round((activity[key] || 0) / 60) };
+    });
+  }
+  function digestData() {
+    var days = weekDays();
+    var total = days.reduce(function (sum, d) { return sum + d.minutes; }, 0);
+    var active = days.filter(function (d) { return d.minutes > 0; }).length;
+    var best = days.reduce(function (a, b) { return b.minutes > a.minutes ? b : a; }, days[0]);
+    var key = dateKeyFor(weekStart());
+    var dates = Progress.getBadgeDates();
+    var badges = Object.keys(dates).filter(function (id) { return dates[id] >= key && BADGE_LABELS[id]; });
+    var headline = active >= 5 ? 'A wonderful week of music.'
+      : active >= 3 ? 'You kept the music going.'
+        : active > 0 ? 'Every bit of practice counts.' : 'Start with one note today.';
+    return { key: key, days: days, total: total, active: active, best: best, goal: Progress.getWeeklyGoal(), badges: badges, headline: headline };
+  }
+  function renderDigestCard() {
+    var d = digestData();
+    if (!d.total || Progress.getDigestSeen() === d.key) return '';
+    var bars = d.days.map(function (day) {
+      var h = Math.min(24, Math.max(3, day.minutes));
+      return '<span class="digest-col"><span class="digest-bar' + (day.key === todayKey() ? ' digest-bar-today' : '') + '" style="height:' + h + 'px"></span></span>';
+    }).join('');
+    return '<section class="digest-card">' +
+      '<div class="digest-card-head"><div><div class="digest-card-kicker">' + t('This week in music') + '</div>' +
+      '<div class="digest-card-title">' + esc(t(d.headline)) + '</div></div>' +
+      '<button class="digest-dismiss" data-action="dismiss-digest" aria-label="' + esc(t('Close')) + '">✕</button></div>' +
+      '<div class="digest-card-min">' + d.total + ' ' + t('Minutes') + ' · ' + d.active + ' ' + t('Active days') + '</div>' +
+      '<div class="digest-bars">' + bars + '</div>' +
+      '<button class="btn secondary btn-small" data-action="open-digest">' + t('Weekly digest') + '</button>' +
+      '</section>';
+  }
+
+  function digestText(d) {
+    return [
+      'Preludio Ukulele — ' + t('Weekly digest'),
+      t(d.headline),
+      t('Minutes') + ': ' + d.total,
+      t('Active days') + ': ' + d.active,
+      t('Day streak') + ': ' + Progress.getStreak(),
+      t('Weekly goal') + ': ' + d.goal
+    ].join('\n');
+  }
+
+  function renderDigest() {
+    var d = digestData();
+    var pct = Math.min(100, Math.round(d.total / d.goal * 100));
+    var goalText = d.total >= d.goal
+      ? t('✓ Goal met — {total} of {goal} min!').replace('{total}', d.total).replace('{goal}', d.goal)
+      : t('{remaining} min to reach your {goal}-minute goal').replace('{remaining}', d.goal - d.total).replace('{goal}', d.goal);
+    var bars = d.days.map(function (day) {
+      var h = Math.min(60, Math.max(4, Math.round(day.minutes / 3)));
+      return '<div class="digest-col' + (day.key === todayKey() ? ' digest-col-today' : '') + '">' +
+        '<span class="digest-bar' + (day.key === todayKey() ? ' digest-bar-today' : '') + '" style="height:' + h + 'px"></span>' +
+        '<span class="digest-col-label">' + t(day.label) + '</span>' +
+        '<span class="digest-col-min">' + day.minutes + '</span></div>';
+    }).join('');
+    var goalChips = GOAL_OPTIONS.map(function (min) {
+      return '<button class="digest-goal-chip' + (min === d.goal ? ' active' : '') + '" data-action="digest-goal" data-min="' + min + '">' + min + '</button>';
+    }).join('');
+    var badgeHtml = d.badges.length
+      ? d.badges.map(function (id) { return '<span class="digest-badge">' + BADGE_INFO[id] + ' ' + esc(t(BADGE_LABELS[id])) + '</span>'; }).join('')
+      : '<span class="report-empty">' + t('No new badges this week') + '</span>';
+
+    var html = '<div class="screen digest-screen">';
+    html += '<header class="app-header"><button class="icon-btn" data-action="close-digest" aria-label="' + esc(t('Back')) + '">←</button>';
+    html += '<div class="header-title">' + t('Weekly digest') + '</div><div class="header-spacer"></div></header>';
+    html += '<div class="lesson-body report-body">';
+    html += '<div class="kicker">' + t('This week in music') + '</div>';
+    html += '<h1 class="lesson-title">' + esc(t(d.headline)) + '</h1>';
+    html += '<div class="digest-stats-row">';
+    html += '<div class="stat-card"><div class="stat-value">' + d.total + '</div><div class="stat-label">' + t('Minutes') + '</div></div>';
+    html += '<div class="stat-card"><div class="stat-value">' + d.active + '</div><div class="stat-label">' + t('Active days') + '</div></div>';
+    html += '<div class="stat-card"><div class="stat-value">' + Progress.getStreak() + '</div><div class="stat-label">' + t('Day streak') + '</div></div>';
+    html += '</div>';
+    html += '<div class="report-section-label">' + t('Daily practice (minutes)') + '</div>';
+    html += '<div class="digest-bars-tall">' + bars + '</div>';
+    html += '<p class="digest-best">' + t('Best day: {label} · {minutes} min').replace('{label}', t(d.best.label)).replace('{minutes}', d.best.minutes) + '</p>';
+    html += '<div class="report-section-label">' + t('Weekly goal') + '</div>';
+    html += '<div class="digest-goal"><div class="digest-goal-track"><div class="digest-goal-fill" style="width:' + pct + '%"></div></div>';
+    html += '<div class="digest-goal-status">' + esc(goalText) + '</div>';
+    html += '<div class="digest-goal-options">' + goalChips + '</div></div>';
+    html += '<div class="report-section-label">' + t('New badges this week') + '</div>';
+    html += '<div class="report-badges">' + badgeHtml + '</div>';
+    html += '</div>';
+    html += '<div class="action-bar"><button class="btn secondary" data-action="copy-digest">' + t('Copy recap') + '</button>';
+    html += '<button class="btn secondary" data-action="print-digest">' + t('Print') + '</button></div>';
+    return html + '</div>';
+  }
+
+  // ── TOUR / REFERENCE ────────────────────────────────────────────────
+  var TOUR_SLIDES = [
+    { title: 'Welcome to Preludio Ukulele', text: 'A one-minute tour to show you how everything fits together.', art: '♪' },
+    { title: 'Follow your lesson path', text: 'Start at the top. Each lesson unlocks the next one, so you always know what to practise.', art: '🗺️' },
+    { title: 'See it, then check it', text: 'Every note and chord has a clear picture on the fretboard, followed by a quick check.', art: 'fret' },
+    { title: 'Play it yourself', text: 'Hear the model, then play it on your own ukulele. Tap “I played it” when you are ready.', art: '🎶' },
+    { title: 'Practice and tools', text: 'Timed games, a metronome, a tuner, and a chord chart are one tap away.', art: '🎯' },
+    { title: 'Watch yourself grow', text: 'Stars, XP, and your progress report show how far you have come.', art: '📋' }
+  ];
+
+  function renderTour() {
+    var slide = TOUR_SLIDES[APP.tourSlide] || TOUR_SLIDES[0];
+    var art = slide.art === 'fret' ? Graphics.fretboard(4, 1, t('E')) : '<span>' + esc(slide.art) + '</span>';
+    var dots = TOUR_SLIDES.map(function (_, i) {
+      return '<span class="tour-dot' + (i === APP.tourSlide ? ' active' : '') + '"></span>';
+    }).join('');
+    var html = '<div class="screen tour-screen">';
+    html += '<header class="lesson-header"><button class="icon-btn" data-action="tour-finish" aria-label="' + esc(t('Close')) + '">✕</button>';
+    html += '<div class="lesson-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round((APP.tourSlide + 1) / TOUR_SLIDES.length * 100) + '"><div class="lesson-progress-fill" style="width:' + Math.round((APP.tourSlide + 1) / TOUR_SLIDES.length * 100) + '%"></div></div></header>';
+    html += '<div class="lesson-body tour-body"><div class="kicker">' + t('Quick tour') + '</div>';
+    html += '<h1 class="lesson-title">' + esc(t(slide.title)) + '</h1>';
+    html += '<p class="lesson-desc">' + esc(t(slide.text)) + '</p>';
+    html += '<div class="tour-art">' + art + '</div>';
+    html += '<div class="tour-dots">' + dots + '</div></div>';
+    html += '<div class="action-bar">';
+    html += '<button class="btn secondary" data-action="tour-back"' + (APP.tourSlide === 0 ? ' disabled' : '') + '>' + t('Back') + '</button>';
+    if (APP.tourSlide === TOUR_SLIDES.length - 1) html += '<button class="btn primary" data-action="tour-finish">' + t('Start playing') + '</button>';
+    else html += '<button class="btn primary" data-action="tour-next">' + t('Next') + '</button>';
+    html += '</div><button class="tour-skip" data-action="tour-finish">' + t('Skip the tour') + '</button></div>';
+    return html;
+  }
+
+  function renderReferenceOverlay() {
+    var lesson = lessonById(APP.showReference);
+    if (!lesson) return '';
+    var diagram;
+    if (isSong(lesson)) diagram = songChartHtml(lesson);
+    else if (isChord(lesson)) diagram = Graphics.chordDiagram(CURRICULUM.chords[lesson.chord], { showName: false });
+    else diagram = Graphics.fretboard(lesson.fret, lesson.string, t(lesson.note));
+    var html = '<div class="reference-overlay" data-action="close-reference">';
+    html += '<div class="reference-content" data-action="reference-dialog" role="dialog" aria-modal="true" aria-label="' + esc(t('View reference')) + '">';
+    html += '<div class="reference-header"><strong>' + esc(lessonTitle(lesson)) + '</strong>';
+    html += '<button class="icon-btn" data-action="close-reference" aria-label="' + esc(t('Close')) + '">✕</button></div>';
+    html += '<div class="reference-diagram">' + diagram + '</div>';
+    html += '<p class="reference-desc">' + esc(t(lesson.description)) + '</p>';
+    html += '<p class="reference-prompt">' + esc(t(lesson.prompt)) + '</p>';
+    html += '<button class="btn secondary wide" data-action="hear-reference">🔊 ' + t('Hear it') + '</button>';
+    return html + '</div></div>';
+  }
+
+  function hearReference() {
+    var lesson = lessonById(APP.showReference);
+    if (!lesson) return;
+    if (isSong(lesson)) {
+      if (lesson.songKind === 'chord') Audio.playChord(CURRICULUM.chords[lesson.bars[0]]);
+      else Audio.pluck(Audio.noteFreq(lesson.notes[0].string, lesson.notes[0].fret));
+    } else if (isChord(lesson)) Audio.playChord(CURRICULUM.chords[lesson.chord]);
+    else Audio.play(lesson.freq);
+  }
+
+  // ── PLAN / REPORT ────────────────────────────────────────────────────
+  function renderPlanCard() {
+    var plan = getPlan();
+    if (!plan.items.length) return '';
+    var done = plan.items.filter(function (item) { return item.done; }).length;
+    var html = '<section class="plan-card' + (done === plan.items.length ? ' plan-card-done' : '') + '">';
+    html += '<div class="plan-header"><div class="plan-title">' + t("Today's Plan") + '</div>';
+    html += '<div class="plan-count">' + done + ' / ' + plan.items.length + '</div></div>';
+    html += '<div class="plan-items">';
+    plan.items.forEach(function (item) {
+      html += '<div class="plan-item' + (item.done ? ' plan-item-done' : '') + '">';
+      html += '<span class="plan-item-icon">' + (item.done ? '✓' : '•') + '</span>';
+      html += '<span class="plan-item-text"><span class="plan-item-name">' + esc(planLabel(item)) + '</span>';
+      html += '<span class="plan-item-reason">' + esc(t(item.reason)) + '</span></span>';
+      html += item.done
+        ? '<span class="plan-item-tag">' + t('Done') + '</span>'
+        : '<button class="plan-item-btn" data-action="plan-start" data-id="' + esc(item.id) + '">' + t('Start') + '</button>';
+      html += '</div>';
+    });
+    html += '</div>';
+    if (done === plan.items.length) html += '<p class="plan-done-note">' + t('All done — nice work!') + '</p>';
+    return html + '</section>';
+  }
+
+  var BADGE_INFO = {
+    'first-sound': '♪',
+    'first-lesson': '★',
+    'first-chord': '♬',
+    'first-song': '♫',
+    'ten-lessons': '🔟',
+    'all-lessons': '🏆',
+    'streak-seven': '🔥',
+    'quick-fingers': '⚡'
+  };
+  var BADGE_LABELS = {
+    'first-sound': 'First sound',
+    'first-lesson': 'First lesson',
+    'first-chord': 'First chord',
+    'first-song': 'First song',
+    'ten-lessons': 'Ten lessons',
+    'all-lessons': 'Course complete',
+    'streak-seven': 'Seven-day streak',
+    'quick-fingers': 'Quick fingers'
+  };
+
+  function weakRows(type) {
+    var list = flatLessons().filter(function (l) { return l.type === type && Progress.isCompleted(l.id); });
+    return list.map(function (l) {
+      var key = type === 'chord' ? l.chord : l.id;
+      var skill = Progress.getSkill(key);
+      var acc = skill && skill.total ? Math.round(skill.correct / skill.total * 100) : 60;
+      return { lesson: l, acc: acc };
+    }).sort(function (a, b) { return a.acc - b.acc; }).slice(0, 3);
+  }
+
+  function renderWeakList(type) {
+    var rows = weakRows(type);
+    if (!rows.length) return '<p class="report-empty">' + t('No practice recorded yet.') + '</p>';
+    return rows.map(function (row) {
+      return '<div class="weak-row"><span class="weak-name">' + esc(lessonTitle(row.lesson)) + '</span>' +
+        '<span class="weak-bar"><span class="weak-bar-fill" style="width:' + row.acc + '%"></span></span>' +
+        '<span class="weak-pct">' + row.acc + '%</span></div>';
+    }).join('');
+  }
+
+  function reportText() {
+    var lines = [
+      'Preludio Ukulele — ' + t('Progress report'),
+      t('Level') + ': ' + Progress.getLevel(),
+      t('XP') + ': ' + Progress.getXp(),
+      t('Day streak') + ': ' + Progress.getStreak(),
+      t('Lessons') + ': ' + Progress.getCompletedCount() + ' / ' + flatLessons().length,
+      t('Songs') + ': ' + Progress.getLearnedCount('song') + ' / ' + flatLessons().filter(function (l) { return l.type === 'song'; }).length
+    ];
+    return lines.join('\n');
+  }
+
+  function renderReport() {
+    var total = flatLessons().length;
+    var songs = flatLessons().filter(function (l) { return l.type === 'song'; }).length;
+    var html = '<div class="screen report-screen">';
+    html += '<header class="app-header"><button class="icon-btn" data-action="back-map" aria-label="' + esc(t('Back')) + '">←</button>';
+    html += '<div class="header-title">' + t('Progress report') + '</div><div class="header-spacer"></div></header>';
+    html += '<div class="lesson-body report-body">';
+    html += '<div class="report-hero"><div class="report-avatar">♪</div><div><h1 class="lesson-title">' + t('Progress report') + '</h1>';
+    html += '<p class="report-date">' + t('Keep going — every note counts.') + '</p></div></div>';
+    html += '<div class="stats-row">';
+    html += '<div class="stat-card"><div class="stat-value">' + Progress.getCompletedCount() + '</div><div class="stat-label">' + t('Lessons') + '</div></div>';
+    html += '<div class="stat-card"><div class="stat-value">' + Progress.getLearnedCount('song') + '/' + songs + '</div><div class="stat-label">' + t('Songs') + '</div></div>';
+    html += '<div class="stat-card"><div class="stat-value">' + Progress.getXp() + '</div><div class="stat-label">' + t('XP') + '</div></div>';
+    html += '</div>';
+    html += '<div class="report-section-label">' + t('Your path') + '</div>';
+    CURRICULUM.units.forEach(function (unit) {
+      var done = unit.lessons.filter(function (l) { return Progress.isCompleted(l.id); }).length;
+      var pct = Math.round(done / unit.lessons.length * 100);
+      html += '<div class="report-card"><div class="report-card-head"><span class="report-card-name">' + esc(t(unit.title)) + '</span>';
+      html += '<span class="report-card-line">' + done + '/' + unit.lessons.length + '</span></div>';
+      html += '<div class="report-bar-track"><div class="report-bar-fill" style="width:' + pct + '%"></div></div></div>';
+    });
+    html += '<div class="report-section-label">' + t('Focus areas') + '</div>';
+    html += '<div class="weak-card"><div class="weak-title">' + t('Notes') + '</div>' + renderWeakList('note') + '</div>';
+    html += '<div class="weak-card"><div class="weak-title">' + t('Chords') + '</div>' + renderWeakList('chord') + '</div>';
+    html += '<div class="report-section-label">' + t('Badges') + '</div>';
+    html += '<div class="badges-grid">';
+    Object.keys(BADGE_INFO).forEach(function (id) {
+      var earned = Progress.hasBadge(id);
+      html += '<div class="badge' + (earned ? ' badge-earned' : ' badge-locked') + '" title="' + esc(t(BADGE_LABELS[id])) + '">';
+      html += '<span class="badge-icon">' + BADGE_INFO[id] + '</span><span class="badge-name">' + esc(t(BADGE_LABELS[id])) + '</span></div>';
+    });
+    html += '</div>';
+    html += '</div>';
+    html += '<div class="action-bar"><button class="btn secondary" data-action="copy-report">' + t('Copy summary') + '</button>';
+    html += '<button class="btn secondary" data-action="print-report">' + t('Print') + '</button></div>';
+    return html + '</div>';
   }
 
   // ── LESSON ─────────────────────────────────────────────────────────────
@@ -217,6 +643,7 @@
     stopSong();
     stopCountIn();
     Practice.stopAll();
+    APP.showReference = null;
     APP.lessonId = id;
     APP.phase = 'present';
     APP.quiz = null;
@@ -234,6 +661,7 @@
     Practice.stopAll();
     APP.screen = 'map';
     APP.lessonId = null;
+    APP.showReference = null;
     APP.phase = 'present';
     APP.quiz = null;
     render();
@@ -502,6 +930,8 @@
     APP.lastStars = result.bestStars;
     APP.lastXp = result.xpGain;
     APP.lastWasFirst = result.first;
+    markPlanDone(function (item) { return item.kind === 'lesson' && item.ref === lesson.id; });
+    announceBadges(Progress.evaluateBadges());
     APP.phase = 'complete';
     render();
   }
@@ -836,6 +1266,39 @@
     var action = target.getAttribute('data-action');
 
     if (action === 'open-lesson') startLesson(target.getAttribute('data-id'));
+    else if (action === 'plan-start') {
+      var item = getPlan().items.filter(function (i) { return i.id === target.getAttribute('data-id'); })[0];
+      if (item && !item.done) {
+        if (item.kind === 'game') Practice.startGame(item.ref);
+        else startLesson(item.ref);
+      }
+    }
+    else if (action === 'open-report') { APP.screen = 'report'; render(); }
+    else if (action === 'open-song-library') { APP.screen = 'song-library'; render(); }
+    else if (action === 'open-digest') { Progress.setDigestSeen(digestData().key); APP.screen = 'digest'; render(); }
+    else if (action === 'dismiss-digest') { Progress.setDigestSeen(digestData().key); render(true); }
+    else if (action === 'close-digest') goMap();
+    else if (action === 'digest-goal') { Progress.setWeeklyGoal(Number(target.getAttribute('data-min'))); render(true); }
+    else if (action === 'copy-digest') {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(digestText(digestData())).then(function () { showToast(t('Summary copied.')); }).catch(function () {});
+      }
+    }
+    else if (action === 'print-digest') { window.print(); }
+    else if (action === 'open-tour') { APP.tourSlide = 0; APP.screen = 'tour'; render(); }
+    else if (action === 'tour-next') { APP.tourSlide = Math.min(TOUR_SLIDES.length - 1, APP.tourSlide + 1); render(true); }
+    else if (action === 'tour-back') { APP.tourSlide = Math.max(0, APP.tourSlide - 1); render(true); }
+    else if (action === 'tour-finish' || action === 'tour-skip') { Progress.markTourSeen(); goMap(); }
+    else if (action === 'open-reference') { APP.showReference = target.getAttribute('data-id'); render(true); }
+    else if (action === 'close-reference') { APP.showReference = null; render(true); }
+    else if (action === 'hear-reference') hearReference();
+    else if (action === 'copy-report') {
+      var text = reportText();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { showToast(t('Summary copied.')); }).catch(function () {});
+      }
+    }
+    else if (action === 'print-report') { window.print(); }
     else if (action === 'back-map') goMap();
     else if (action === 'goto-quiz') { stopSong(); stopCountIn(); APP.phase = 'quiz'; APP.quiz = null; APP.wrongCount = 0; render(); }
     else if (action === 'quiz-answer') { answerQuiz(target.getAttribute('data-value')); render(true); }
@@ -858,7 +1321,11 @@
     }
     else if (action === 'open-first-sound') { APP.screen = 'first-sound'; render(); }
     else if (action === 'close-first-sound') goMap();
-    else if (action === 'start-learning') { Progress.markFirstSoundSeen(); goMap(); }
+    else if (action === 'start-learning') {
+      Progress.markFirstSoundSeen();
+      if (!Progress.hasSeenTour()) { APP.tourSlide = 0; APP.screen = 'tour'; render(); }
+      else goMap();
+    }
     else if (action === 'hear-open') Audio.play(CURRICULUM.tuningFreqs[Number(target.getAttribute('data-string'))]);
     else if (action === 'hear-strum') Audio.strum(CURRICULUM.tuningFreqs, { down: true });
     else if (action === 'open-settings') { APP.screen = 'settings'; render(); }
@@ -886,6 +1353,24 @@
   });
 
   applySavedTheme();
+
+  var sessionStart = Date.now();
+  function flushSession() {
+    var seconds = Math.round((Date.now() - sessionStart) / 1000);
+    if (seconds >= 2) Progress.addPracticeSeconds(seconds);
+    sessionStart = Date.now();
+  }
+  window.addEventListener('pagehide', flushSession);
+  document.addEventListener('visibilitychange', function () { if (document.hidden) flushSession(); });
+  setInterval(flushSession, 60000);
+
+  window.PreludioHooks = {
+    onGameFinish: function (mode) {
+      markPlanDone(function (item) { return item.kind === 'game' && item.ref === mode; });
+      announceBadges(Progress.evaluateBadges());
+    }
+  };
+
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render);
   else render();
 

@@ -16,6 +16,13 @@
       lessons: {},
       games: {},
       skills: {},
+      plan: null,
+      badges: [],
+      badgeDates: {},
+      digestSeen: null,
+      activity: {},
+      weeklyGoal: 60,
+      tourSeen: false,
       firstSoundSeen: false
     };
   }
@@ -46,6 +53,13 @@
         lessons: data.lessons && typeof data.lessons === 'object' ? data.lessons : {},
         games: data.games && typeof data.games === 'object' ? data.games : {},
         skills: data.skills && typeof data.skills === 'object' ? data.skills : {},
+        plan: data.plan && typeof data.plan === 'object' ? data.plan : null,
+        badges: Array.isArray(data.badges) ? data.badges : [],
+        badgeDates: data.badgeDates && typeof data.badgeDates === 'object' ? data.badgeDates : {},
+        digestSeen: data.digestSeen || null,
+        activity: data.activity && typeof data.activity === 'object' ? data.activity : {},
+        weeklyGoal: Number(data.weeklyGoal) > 0 ? Number(data.weeklyGoal) : 60,
+        tourSeen: !!data.tourSeen,
         firstSoundSeen: !!data.firstSoundSeen
       };
     } catch (e) {
@@ -207,6 +221,67 @@
     save();
   }
 
+  function getPlan() { return state.plan; }
+  function setPlan(plan) { state.plan = plan; save(); }
+
+  function addPracticeSeconds(seconds) {
+    var n = Math.min(1800, Math.max(0, Number(seconds) || 0));
+    if (!n) return;
+    var key = dateKey();
+    state.activity[key] = (Number(state.activity[key]) || 0) + n;
+    save();
+  }
+  function getActivity() {
+    var copy = {};
+    Object.keys(state.activity).forEach(function (key) { copy[key] = state.activity[key]; });
+    return copy;
+  }
+  function getWeeklyGoal() { return Number(state.weeklyGoal) || 60; }
+  function setWeeklyGoal(minutes) {
+    state.weeklyGoal = Math.max(1, Number(minutes) || 60);
+    save();
+  }
+
+  function hasSeenTour() { return !!state.tourSeen; }
+  function markTourSeen() {
+    if (state.tourSeen) return;
+    state.tourSeen = true;
+    save();
+  }
+
+  var BADGE_TESTS = [
+    { id: 'first-sound', test: function () { return state.firstSoundSeen; } },
+    { id: 'first-lesson', test: function () { return getCompletedCount() >= 1; } },
+    { id: 'first-chord', test: function () { return getLearnedCount('chord') >= 1; } },
+    { id: 'first-song', test: function () { return getLearnedCount('song') >= 1; } },
+    { id: 'ten-lessons', test: function () { return getCompletedCount() >= 10; } },
+    { id: 'all-lessons', test: function () { return getCompletedCount() >= lessons().length && lessons().length > 0; } },
+    { id: 'streak-seven', test: function () { return state.streak >= 7; } },
+    { id: 'quick-fingers', test: function () { return getGameBest('note') >= 10 || getGameBest('chord') >= 10; } }
+  ];
+
+  function getBadges() { return state.badges.slice(); }
+  function getBadgeDates() {
+    var copy = {};
+    Object.keys(state.badgeDates).forEach(function (id) { copy[id] = state.badgeDates[id]; });
+    return copy;
+  }
+  function getDigestSeen() { return state.digestSeen; }
+  function setDigestSeen(key) { state.digestSeen = key; save(); }
+  function hasBadge(id) { return state.badges.indexOf(id) !== -1; }
+  function evaluateBadges() {
+    var earned = [];
+    BADGE_TESTS.forEach(function (badge) {
+      if (!hasBadge(badge.id) && badge.test()) {
+        state.badges.push(badge.id);
+        state.badgeDates[badge.id] = dateKey();
+        earned.push(badge.id);
+      }
+    });
+    if (earned.length) save();
+    return earned;
+  }
+
   var Progress = {
     completeLesson: completeLesson,
     isCompleted: isCompleted,
@@ -227,6 +302,20 @@
     setGameBest: setGameBest,
     getSkill: getSkill,
     recordSkill: recordSkill,
+    getPlan: getPlan,
+    setPlan: setPlan,
+    addPracticeSeconds: addPracticeSeconds,
+    getActivity: getActivity,
+    getWeeklyGoal: getWeeklyGoal,
+    setWeeklyGoal: setWeeklyGoal,
+    hasSeenTour: hasSeenTour,
+    markTourSeen: markTourSeen,
+    getBadges: getBadges,
+    getBadgeDates: getBadgeDates,
+    getDigestSeen: getDigestSeen,
+    setDigestSeen: setDigestSeen,
+    hasBadge: hasBadge,
+    evaluateBadges: evaluateBadges,
     _state: function () { return state; }
   };
 
