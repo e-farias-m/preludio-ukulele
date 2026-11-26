@@ -8,7 +8,7 @@
     var label = note || '';
     var s='<div style="position:relative;display:inline-block;max-width:100%">';
     s+='<img src="images/instruments/fretboard.jpg" alt="Ukulele fretboard" style="width:100%;height:auto;display:block;border-radius:8px;">';
-    s+='<span style="position:absolute;left:'+dx+'%;top:'+dy+'%;width:31px;height:31px;border-radius:50%;background:#fff;border:2px solid #000;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;box-shadow:0 1px 4px rgba(0,0,0,0.3);">'+label+'</span>';
+    s+='<span style="position:absolute;left:'+dx+'%;top:'+dy+'%;width:28px;height:28px;border-radius:50%;background:#fff;border:2px solid #000;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000;box-shadow:0 1px 4px rgba(0,0,0,0.3);">'+label+'</span>';
     s+='</div>';
     return s;
   }
