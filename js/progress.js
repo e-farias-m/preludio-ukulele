@@ -14,6 +14,8 @@
       streak: 0,
       lastDate: null,
       lessons: {},
+      games: {},
+      skills: {},
       firstSoundSeen: false
     };
   }
@@ -42,6 +44,8 @@
         streak: Number(data.streak) || 0,
         lastDate: data.lastDate || null,
         lessons: data.lessons && typeof data.lessons === 'object' ? data.lessons : {},
+        games: data.games && typeof data.games === 'object' ? data.games : {},
+        skills: data.skills && typeof data.skills === 'object' ? data.skills : {},
         firstSoundSeen: !!data.firstSoundSeen
       };
     } catch (e) {
@@ -159,6 +163,50 @@
     return count;
   }
 
+  function getLearnedCount(type) {
+    var list = lessons();
+    var count = 0;
+    list.forEach(function (lesson) {
+      if (lesson.type === type && isCompleted(lesson.id)) count++;
+    });
+    return count;
+  }
+
+  function addXp(amount) {
+    var n = Math.max(0, Number(amount) || 0);
+    if (!n) return;
+    state.xp += n;
+    save();
+  }
+
+  function getGameBest(mode) {
+    var v = Number(state.games[mode]);
+    return v > 0 ? v : 0;
+  }
+
+  function setGameBest(mode, score) {
+    var best = getGameBest(mode);
+    if (score <= best) return false;
+    state.games[mode] = score;
+    save();
+    return true;
+  }
+
+  function getSkill(key) {
+    var s = state.skills[key];
+    return s ? { correct: Number(s.correct) || 0, total: Number(s.total) || 0 } : null;
+  }
+
+  function recordSkill(key, correct) {
+    if (!key) return;
+    var s = state.skills[key] || { correct: 0, total: 0, lastSeen: 0 };
+    s.total = (Number(s.total) || 0) + 1;
+    if (correct) s.correct = (Number(s.correct) || 0) + 1;
+    s.lastSeen = Date.now();
+    state.skills[key] = s;
+    save();
+  }
+
   var Progress = {
     completeLesson: completeLesson,
     isCompleted: isCompleted,
@@ -173,6 +221,12 @@
     isUnlocked: isUnlocked,
     getNextLesson: getNextLesson,
     getCompletedCount: getCompletedCount,
+    getLearnedCount: getLearnedCount,
+    addXp: addXp,
+    getGameBest: getGameBest,
+    setGameBest: setGameBest,
+    getSkill: getSkill,
+    recordSkill: recordSkill,
     _state: function () { return state; }
   };
 

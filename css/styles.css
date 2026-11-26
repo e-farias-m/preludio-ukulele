@@ -141,7 +141,7 @@ button { font: inherit; color: inherit; }
 .stat-value { font-size: 22px; font-weight: 800; line-height: 1.1; }
 .stat-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-top: 3px; }
 
-.first-sound-cta {
+.first-sound-cta, .practice-banner {
   display: flex; align-items: center; gap: 12px;
   width: 100%; padding: 14px;
   border-radius: 16px;
@@ -152,7 +152,7 @@ button { font: inherit; color: inherit; }
   margin-bottom: 20px;
   transition: border-color .15s, background .15s;
 }
-.first-sound-cta:hover { border-color: var(--accent); background: var(--accent-soft); }
+.first-sound-cta:hover, .practice-banner:hover { border-color: var(--accent); background: var(--accent-soft); }
 .cta-icon {
   flex: 0 0 38px;
   width: 38px; height: 38px;
@@ -595,7 +595,163 @@ button { font: inherit; color: inherit; }
 }
 .count-in-beats span.active { color: var(--accent); transform: scale(1.25); }
 
+/* ── Practice hub & games ──────────────────────────────────────────── */
+.hub-section-title {
+  width: 100%; max-width: 520px;
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .12em; color: var(--muted);
+  text-align: left; margin: 18px 0 8px;
+}
+.sprint-cards {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 10px; width: 100%; max-width: 520px;
+}
+.sprint-card {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  text-align: left; cursor: pointer;
+  transition: border-color .15s, box-shadow .15s, transform .06s;
+}
+.sprint-card:hover:not(:disabled) { border-color: var(--accent); box-shadow: 0 4px 14px rgba(0, 0, 0, .06); }
+.sprint-card:active:not(:disabled) { transform: scale(.985); }
+.sprint-card.locked { opacity: .55; cursor: not-allowed; }
+.sprint-card-title { font-size: 15px; font-weight: 800; }
+.sprint-card-sub { font-size: 12px; color: var(--muted); line-height: 1.35; }
+.sprint-card-best { font-size: 11px; font-weight: 700; color: var(--accent); margin-top: 4px; }
+
+.game-screen { min-height: calc(100dvh - 32px); display: flex; flex-direction: column; }
+.game-screen .lesson-body { flex: 1; }
+.game-screen .lesson-body.result { justify-content: center; }
+.game-hud {
+  display: flex; justify-content: center; gap: 14px;
+  width: 100%; max-width: 470px; margin-bottom: 14px;
+}
+.game-timer, .game-score {
+  min-width: 64px; text-align: center;
+  padding: 7px 12px; border-radius: 99px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  font-size: 14px; font-weight: 800;
+}
+.game-timer { color: var(--accent); }
+.game-prompt { width: 100%; max-width: 470px; margin-bottom: 14px; }
+.game-prompt > div { width: 100%; }
+.game-options {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 10px; width: 100%; max-width: 470px;
+}
+.game-option {
+  padding: 14px 10px; border-radius: 12px;
+  border: 2px solid var(--border);
+  background: var(--surface-2);
+  font-size: 16px; font-weight: 800; cursor: pointer;
+  transition: border-color .15s, background .15s, transform .06s;
+}
+.game-option:hover:not(:disabled) { border-color: var(--accent); }
+.game-option:active:not(:disabled) { transform: scale(.98); }
+.game-option.wrong { border-color: var(--danger); background: #fff5f5; color: var(--danger); opacity: 1; }
+.game-option:disabled { cursor: not-allowed; }
+.game-feedback { width: 100%; max-width: 470px; min-height: 20px; margin-top: 10px; font-size: 14px; font-weight: 700; color: var(--danger); }
+.game-result { text-align: center; }
+.game-result-score { font-size: 56px; font-weight: 800; line-height: 1; color: var(--accent); }
+.game-result-sub { font-size: 14px; color: var(--muted); margin-top: 4px; }
+.game-result-best { font-size: 13px; font-weight: 700; color: var(--gold); margin-top: 12px; }
+.game-result-xp { font-size: 15px; font-weight: 800; color: var(--success); margin-top: 8px; }
+
+/* ── Persistent tools ──────────────────────────────────────────────── */
+#practice-tools { position: fixed; right: 16px; bottom: 16px; z-index: 30; }
+.tool-fab {
+  width: 52px; height: 52px; margin-left: auto;
+  border-radius: 50%;
+  background: var(--accent); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; cursor: pointer;
+  box-shadow: 0 8px 20px var(--accent-shadow);
+}
+.tool-panel {
+  position: absolute; right: 0; bottom: 64px;
+  width: min(340px, calc(100vw - 32px));
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 14px 40px rgba(45, 55, 72, .22);
+  overflow: hidden;
+}
+.tool-panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 10px; border-bottom: 1px solid var(--border);
+}
+.tool-tabs { display: flex; gap: 4px; }
+.tool-tab {
+  padding: 7px 10px; border: 0; border-radius: 9px;
+  background: transparent; color: var(--muted);
+  font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.tool-tab.active { background: var(--accent-soft); color: var(--accent); }
+.tool-close {
+  width: 28px; height: 28px; border: 0; border-radius: 8px;
+  background: transparent; color: var(--muted); cursor: pointer;
+}
+.tool-body { padding: 12px; }
+.metro-dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; }
+.metro-dot { width: 10px; height: 10px; border-radius: 50%; background: #d9d2c6; }
+.metro-dot.downbeat { background: #b9c9d9; }
+.metro-dot.active { background: var(--accent); transform: scale(1.25); }
+.metro-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
+.metro-row label { font-size: 12px; color: var(--muted); }
+.metro-value { min-width: 86px; text-align: center; font-size: 15px; font-weight: 800; }
+.tool-step {
+  width: 32px; height: 32px; border: 0; border-radius: 50%;
+  background: var(--accent-soft); color: var(--accent);
+  font-size: 18px; font-weight: 800; cursor: pointer;
+}
+.metro-presets { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 10px; }
+.tool-pill {
+  padding: 5px 8px; border-radius: 99px;
+  border: 1px solid var(--border); background: var(--surface-2);
+  font-size: 11px; font-weight: 700; cursor: pointer;
+}
+.tool-pill.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.tool-select { padding: 6px 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); font-size: 12px; }
+.tool-actions { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+.tuner-note { text-align: center; font-size: 34px; font-weight: 800; color: var(--accent); }
+.tuner-cents { text-align: center; font-size: 12px; color: var(--muted); min-height: 18px; }
+.tuner-meter {
+  position: relative; height: 8px; border-radius: 99px; margin: 12px 4px 8px;
+  background: linear-gradient(90deg, #feb2b2, #faf089, #9ae6b4);
+}
+.tuner-center { position: absolute; left: 50%; top: -3px; width: 2px; height: 14px; background: var(--fg); transform: translateX(-50%); }
+.tuner-needle { position: absolute; top: -6px; left: 50%; width: 4px; height: 20px; border-radius: 2px; background: var(--fg); transform: translateX(-50%); transition: left .08s; }
+.tuner-strings { text-align: center; font-size: 11px; color: var(--muted); letter-spacing: .14em; }
+
+/* ── Reference chart ───────────────────────────────────────────────── */
+.chart-section { width: 100%; max-width: 520px; margin-top: 18px; text-align: left; }
+.chart-tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+.chart-tab {
+  padding: 8px 12px; border-radius: 99px;
+  border: 1px solid var(--border); background: var(--surface);
+  font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.chart-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.chart-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.chart-card { position: relative; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); padding: 8px; text-align: center; }
+.chart-card.learned { border-color: #a7c9e8; background: #f7fbff; }
+.chart-card-name { font-size: 14px; font-weight: 800; margin-bottom: 6px; }
+.chart-card-diagram img { width: 100%; height: auto; display: block; border-radius: 6px; }
+.chart-hear {
+  position: absolute; top: 6px; right: 6px;
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--surface);
+  cursor: pointer; font-size: 13px;
+}
+
 @media (max-width: 420px) {
+  .header-actions { gap: 5px; }
+  .header-actions .icon-btn { width: 36px; height: 36px; font-size: 15px; }
+  .chart-grid { grid-template-columns: 1fr; }
+  .tool-panel { right: -4px; }
   .app { padding: 12px; }
   .brand-title { font-size: 16px; }
   .continue-title { font-size: 20px; }

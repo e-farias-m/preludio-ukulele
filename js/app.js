@@ -104,6 +104,8 @@
     else if (APP.screen === 'lesson') app.innerHTML = renderLesson();
     else if (APP.screen === 'first-sound') app.innerHTML = renderFirstSound();
     else if (APP.screen === 'settings') app.innerHTML = renderSettings();
+    else if (APP.screen === 'hub') app.innerHTML = Practice.renderHub();
+    else if (APP.screen === 'game') app.innerHTML = Practice.renderGame();
     if (!keepScroll) window.scrollTo(0, 0);
   }
 
@@ -119,6 +121,7 @@
     html += '<header class="app-header">';
     html += '<div class="brand"><div class="brand-mark">♪</div><div><div class="brand-title">Preludio Ukulele</div><div class="brand-sub">gCEA · C6 tuning</div></div></div>';
     html += '<div class="header-actions">';
+    html += '<button class="icon-btn" data-action="open-hub" aria-label="' + esc(t('Practice & tools')) + '">🎯</button>';
     html += '<button class="icon-btn" data-action="open-first-sound" aria-label="' + esc(t('First sounds')) + '">♪</button>';
     html += '<button class="icon-btn" data-action="open-settings" aria-label="' + esc(t('Settings')) + '">⚙</button>';
     html += '</div></header>';
@@ -156,6 +159,14 @@
       html += '</button>';
     }
 
+    if (Progress.getLearnedCount('note') >= 2 || Progress.getLearnedCount('chord') >= 2) {
+      html += '<button class="practice-banner" data-action="open-hub">';
+      html += '<span class="cta-icon" aria-hidden="true">🎯</span>';
+      html += '<span class="cta-copy"><strong>' + t('Ready for a challenge?') + '</strong><small>' + t('Timed games and tools to keep you sharp.') + '</small></span>';
+      html += '<span class="cta-arrow">›</span>';
+      html += '</button>';
+    }
+
     CURRICULUM.units.forEach(function (unit) {
       var done = unit.lessons.filter(function (l) { return Progress.isCompleted(l.id); }).length;
       var unitPct = Math.round(done / unit.lessons.length * 100);
@@ -178,7 +189,7 @@
       html += '</div></section>';
     });
 
-    html += '<footer class="app-footer">Preludio Ukulele · v0.3 · © 2026 Eduardo de Farias Machado. All rights reserved. <a href="LICENSE">Licence</a> · <a href="THIRD_PARTY_NOTICES.md">Third-party notices</a></footer>';
+    html += '<footer class="app-footer">Preludio Ukulele · v0.4 · © 2026 Eduardo de Farias Machado. All rights reserved. <a href="LICENSE">Licence</a> · <a href="THIRD_PARTY_NOTICES.md">Third-party notices</a></footer>';
     html += '</div>';
     return html;
   }
@@ -189,6 +200,7 @@
     if (!lesson || !Progress.isUnlocked(id)) return;
     stopSong();
     stopCountIn();
+    Practice.stopAll();
     APP.lessonId = id;
     APP.phase = 'present';
     APP.quiz = null;
@@ -203,6 +215,7 @@
   function goMap() {
     stopSong();
     stopCountIn();
+    Practice.stopAll();
     APP.screen = 'map';
     APP.lessonId = null;
     APP.phase = 'present';
@@ -832,4 +845,10 @@
   else render();
 
   window.render = render;
+  window.PreludioNav = {
+    go: function (screen) {
+      APP.screen = screen;
+      render();
+    }
+  };
 })();
