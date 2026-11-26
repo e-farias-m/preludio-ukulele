@@ -1,0 +1,14 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><title>Hotspot Picker</title>
+<style>body{font-family:system-ui;margin:16px;background:#f5f1eb;color:#2d3748}#stage{position:relative;display:inline-block;border:2px solid #c4bdb3;background:#fff}#img{display:block;max-width:90vw;max-height:70vh}#coords{font-size:13px;color:#718096;margin:8px 0}textarea{width:100%;height:120px;font-family:monospace;font-size:12px}</style></head><body>
+<h1>Hotspot Picker</h1>
+<input type="file" id="file" accept="image/*">
+<p id="coords">x: — , y: —</p>
+<div id="stage"><img id="img" alt=""></div>
+<textarea id="out" readonly></textarea>
+<script>
+const img=document.getElementById('img'),stage=document.getElementById('stage'),coords=document.getElementById('coords'),out=document.getElementById('out');
+let pts=[];
+document.getElementById('file').addEventListener('change',e=>{const f=e.target.files[0]; if(f) img.src=URL.createObjectURL(f);});
+stage.addEventListener('mousemove',e=>{const r=img.getBoundingClientRect(); coords.textContent='x: '+((e.clientX-r.left)/r.width*100).toFixed(1)+' , y: '+((e.clientY-r.top)/r.height*100).toFixed(1);});
+stage.addEventListener('click',e=>{const r=img.getBoundingClientRect(); const x=+((e.clientX-r.left)/r.width*100).toFixed(1); const y=+((e.clientY-r.top)/r.height*100).toFixed(1); pts.push({x,y}); out.value=JSON.stringify(pts,null,2);});
+</script></body></html>
