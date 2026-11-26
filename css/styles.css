@@ -412,6 +412,189 @@ button { font: inherit; color: inherit; }
 .lang-btn.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
 .settings-note { font-size: 12px; color: var(--muted); margin-top: 8px; }
 
+/* ── Songs ──────────────────────────────────────────────────────────── */
+.lesson-icon.song {
+  border-radius: 13px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 19px;
+  box-shadow: 0 3px 8px var(--accent-shadow);
+}
+.song-chart-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  margin: 6px 0 12px;
+}
+.song-chart {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 10px;
+}
+.strum-legend {
+  display: flex; align-items: center; gap: 5px;
+  margin-bottom: 8px; padding-left: 2px;
+}
+.strum-label {
+  font-size: 9px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--muted); margin-right: 2px;
+}
+.strum-arrow {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800;
+}
+.strum-arrow.up { background: #f0f7ff; color: #4a7fb5; }
+.strum-arrow.rest { background: transparent; color: #cbd5e0; }
+.song-bars { display: grid; gap: 5px; }
+.song-bar {
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 7px 4px 5px;
+  text-align: center;
+  background: #fff;
+  transition: background .1s, border-color .1s, box-shadow .1s;
+}
+.song-bar.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 3px 10px var(--accent-shadow);
+}
+.song-bar-chord { font-size: 17px; font-weight: 800; line-height: 1.1; }
+.song-bar.active .song-bar-chord { color: var(--accent-dark); }
+.song-beats { display: flex; justify-content: center; gap: 4px; margin-top: 4px; }
+.song-beat {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: #d9d2c6;
+  transition: background .08s, transform .08s;
+}
+.song-beat.active { background: var(--accent); transform: scale(1.35); }
+
+.song-controls {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 8px;
+  width: 100%; max-width: 520px;
+  margin: 0 0 12px;
+}
+.song-speed-control {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  background: var(--surface-2);
+}
+.btn-speed {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 16px; font-weight: 800; line-height: 1;
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.btn-speed:hover:not(:disabled) { background: #d3e7f8; }
+.btn-speed:disabled { opacity: .4; cursor: not-allowed; }
+.song-speed-label {
+  min-width: 86px;
+  text-align: center;
+  font-size: 11px; font-weight: 700;
+  color: var(--muted);
+}
+
+.song-chord-guide { width: 100%; max-width: 520px; margin: 0 0 14px; text-align: left; }
+.song-chord-guide summary {
+  cursor: pointer;
+  font-size: 13px; font-weight: 700;
+  color: var(--accent);
+  padding: 6px 2px;
+  list-style: none;
+}
+.song-chord-guide summary::-webkit-details-marker { display: none; }
+.song-chord-guide summary::before {
+  content: '▸';
+  display: inline-block;
+  margin-right: 6px;
+  transition: transform .15s;
+}
+.song-chord-guide[open] summary::before { transform: rotate(90deg); }
+.song-chord-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 10px; padding-top: 6px;
+}
+.song-chord-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  padding: 8px;
+  text-align: center;
+}
+.song-chord-name { font-size: 14px; font-weight: 800; margin-bottom: 6px; }
+.song-chord-card img { border-radius: 6px; }
+.btn-small {
+  padding: 7px 10px;
+  font-size: 12px;
+  border-radius: 9px;
+  margin-top: 6px;
+  width: 100%;
+}
+
+.song-tab-wrap {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 6px 8px;
+  overflow: hidden;
+}
+.song-tab-svg { width: 100%; height: auto; display: block; }
+.tab-string-line { stroke: #cbd5e0; stroke-width: 1; }
+.tab-bar-line { stroke: #a0aec0; stroke-width: 1.2; }
+.tab-string-label { font-size: 13px; font-weight: 800; fill: var(--muted); }
+.tab-time-sig { font-size: 11px; font-weight: 700; fill: var(--muted); }
+.tab-note rect {
+  fill: #fff;
+  stroke: #2d3748;
+  stroke-width: 1.5;
+  transition: fill .08s, stroke .08s;
+}
+.tab-note-name {
+  font-size: 11px; font-weight: 700;
+  fill: var(--muted);
+  transition: fill .08s;
+}
+.tab-note-name-bg { fill: var(--surface-2); }
+.tab-fret {
+  font-size: 16px; font-weight: 800;
+  fill: #2d3748;
+  transition: fill .08s;
+}
+.tab-note.active rect { fill: #f6c344; stroke: #b7791f; }
+.tab-note.active .tab-fret { fill: #744210; }
+.tab-note.active .tab-note-name { fill: #b7791f; }
+
+.count-in-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255, 253, 249, .86);
+  border-radius: 14px;
+  z-index: 2;
+  backdrop-filter: blur(1px);
+}
+.count-in-beats { display: flex; gap: 16px; }
+.count-in-beats span {
+  font-size: 30px; font-weight: 800;
+  color: #cbd5e0;
+  transition: color .08s, transform .08s;
+}
+.count-in-beats span.active { color: var(--accent); transform: scale(1.25); }
+
 @media (max-width: 420px) {
   .app { padding: 12px; }
   .brand-title { font-size: 16px; }
@@ -419,4 +602,9 @@ button { font: inherit; color: inherit; }
   .lesson-title { font-size: 24px; }
   .complete-title { font-size: 23px; }
   .quiz-options { grid-template-columns: 1fr; }
+  .song-bar-chord { font-size: 15px; }
+  .song-chord-grid { grid-template-columns: 1fr; }
+  .song-speed-label { min-width: 78px; }
+  .count-in-beats span { font-size: 26px; }
+  .song-controls .btn { padding: 10px 12px; font-size: 14px; }
 }

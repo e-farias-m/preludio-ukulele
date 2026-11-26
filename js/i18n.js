@@ -151,7 +151,50 @@
     "B is eleven frets up.": "Si fica onze casas acima.",
     "Press the C string at the 11th fret.": "Pressione a corda Dó na casa 11.",
     "One octave above open C.": "Uma oitava acima do Dó solto.",
-    "Press the C string at the 12th fret.": "Pressione a corda Dó na casa 12."
+    "Press the C string at the 12th fret.": "Pressione a corda Dó na casa 12.",
+
+    // Songs — UI
+    "New song": "Nova música",
+    "New melody": "Nova melodia",
+    "Play the song": "Tocar a música",
+    "Replay the song": "Repetir a música",
+    "Play the melody": "Tocar a melodia",
+    "Replay the melody": "Repetir a melodia",
+    "Stop": "Parar",
+    "Slower": "Mais lento",
+    "Faster": "Mais rápido",
+    "Strum": "Batida",
+    "Chord guide": "Guia de acordes",
+    "Tablature": "Tablatura",
+    "Start count-in": "Iniciar contagem",
+    "Count-in again": "Contar novamente",
+    "Hear the song": "Ouvir a música",
+    "Hear the melody": "Ouvir a melodia",
+    "Play each note on the C string. The tab shows the fret numbers.": "Toque cada nota na corda Dó. A tablatura mostra os números das casas.",
+    "Strum the chord shown in each bar. Keep your hand moving.": "Rasgue o acorde indicado em cada compasso. Mantenha a mão em movimento.",
+
+    // Songs — curriculum
+    "Frère Jacques": "Frère Jacques",
+    "A French folk round you can play with just C and F.": "Uma canção folclórica francesa que você pode tocar apenas com Dó e Fá.",
+    "Strum C for the first four bars, then follow the chart. Change chords on the first beat of each bar.": "Rasgue Dó nos primeiros quatro compassos, depois siga o diagrama. Troque de acorde no primeiro tempo de cada compasso.",
+    "First Blues": "Primeiro blues",
+    "A slow eight-bar blues using C7 and F. The seventh gives it a bluesy colour.": "Um blues lento de oito compassos usando Dó7 e Fá. A sétima dá um colorido blues.",
+    "Four bars of C7, two of F, then back to C7. Let each strum ring.": "Quatro compassos de Dó7, dois de Fá, depois de volta ao Dó7. Deixe cada batida soar.",
+    "When the Saints Go Marching In": "Quando os santos marcharem",
+    "A traditional spiritual. Three chords and a marching pulse.": "Um spiritual tradicional. Três acordes e um pulso de marcha.",
+    "Keep your strumming hand moving in steady quarter notes. Change chords on the first beat of the bar.": "Mantenha a mão da batida em semínimas constantes. Troque de acorde no primeiro tempo do compasso.",
+    "La Bamba": "La Bamba",
+    "A traditional son jarocho from Veracruz, Mexico. Three chords, fast and festive.": "Um son jarocho tradicional de Veracruz, México. Três acordes, rápido e festivo.",
+    "C, F, G7, C — one bar each. Keep the changes crisp and the strum relaxed.": "Dó, Fá, Sol7, Dó — um compasso cada. Mantenha as trocas nítidas e a batida relaxada.",
+    "The Water Is Wide": "A água é larga",
+    "A gentle folk song in 3/4 time. Four chords, slow and steady.": "Uma canção folclórica suave em 3/4. Quatro acordes, lenta e constante.",
+    "One chord per bar. Let the last strum ring while you move to the next chord.": "Um acorde por compasso. Deixe a última batida soar enquanto muda para o próximo acorde.",
+    "Scarborough Fair": "Feira de Scarborough",
+    "An old English ballad in A minor. The D chord adds a bright lift.": "Uma antiga balada inglesa em Lá menor. O acorde de Ré dá um brilho especial.",
+    "Keep the Am shape relaxed as you move to G. The D chord is the surprise at the end of each phrase.": "Mantenha a forma de Lá menor relaxada ao passar para Sol. O acorde de Ré é a surpresa no fim de cada frase.",
+    "Ode to Joy": "Ode à alegria",
+    "Beethoven's famous melody, played on the C string with the first five notes of the scale.": "A famosa melodia de Beethoven, tocada na corda Dó com as cinco primeiras notas da escala.",
+    "Play each note with a relaxed finger. Let the phrase breathe at the end of each line.": "Toque cada nota com o dedo relaxado. Deixe a frase respirar no fim de cada linha."
   };
 
   var FR = {
@@ -301,7 +344,50 @@
     "B is eleven frets up.": "Si est onze frettes plus haut.",
     "Press the C string at the 11th fret.": "Appuyez sur la corde de do à la 11e frette.",
     "One octave above open C.": "Une octave au-dessus du do à vide.",
-    "Press the C string at the 12th fret.": "Appuyez sur la corde de do à la 12e frette."
+    "Press the C string at the 12th fret.": "Appuyez sur la corde de do à la 12e frette.",
+
+    // Songs — UI
+    "New song": "Nouvelle chanson",
+    "New melody": "Nouvelle mélodie",
+    "Play the song": "Jouer la chanson",
+    "Replay the song": "Rejouer la chanson",
+    "Play the melody": "Jouer la mélodie",
+    "Replay the melody": "Rejouer la mélodie",
+    "Stop": "Arrêter",
+    "Slower": "Plus lent",
+    "Faster": "Plus rapide",
+    "Strum": "Gratte",
+    "Chord guide": "Guide des accords",
+    "Tablature": "Tablature",
+    "Start count-in": "Commencer le décompte",
+    "Count-in again": "Recommencer le décompte",
+    "Hear the song": "Écouter la chanson",
+    "Hear the melody": "Écouter la mélodie",
+    "Play each note on the C string. The tab shows the fret numbers.": "Jouez chaque note sur la corde de do. La tablature indique les numéros de frette.",
+    "Strum the chord shown in each bar. Keep your hand moving.": "Grattez l'accord indiqué dans chaque mesure. Gardez la main en mouvement.",
+
+    // Songs — curriculum
+    "Frère Jacques": "Frère Jacques",
+    "A French folk round you can play with just C and F.": "Une chanson folklorique française que vous pouvez jouer avec seulement do et fa.",
+    "Strum C for the first four bars, then follow the chart. Change chords on the first beat of each bar.": "Grattez do pendant les quatre premières mesures, puis suivez le schéma. Changez d'accord sur le premier temps de chaque mesure.",
+    "First Blues": "Premier blues",
+    "A slow eight-bar blues using C7 and F. The seventh gives it a bluesy colour.": "Un blues lent de huit mesures avec do7 et fa. La septième lui donne une couleur blues.",
+    "Four bars of C7, two of F, then back to C7. Let each strum ring.": "Quatre mesures de do7, deux de fa, puis retour à do7. Laissez chaque coup de gratte résonner.",
+    "When the Saints Go Marching In": "Quand les saints marcheront",
+    "A traditional spiritual. Three chords and a marching pulse.": "Un spiritual traditionnel. Trois accords et un rythme de marche.",
+    "Keep your strumming hand moving in steady quarter notes. Change chords on the first beat of the bar.": "Gardez votre main de gratte en noires régulières. Changez d'accord sur le premier temps de la mesure.",
+    "La Bamba": "La Bamba",
+    "A traditional son jarocho from Veracruz, Mexico. Three chords, fast and festive.": "Un son jarocho traditionnel de Veracruz, au Mexique. Trois accords, rapide et festif.",
+    "C, F, G7, C — one bar each. Keep the changes crisp and the strum relaxed.": "Do, fa, sol7, do — une mesure chacun. Gardez les changements nets et la gratte détendue.",
+    "The Water Is Wide": "L'eau est vaste",
+    "A gentle folk song in 3/4 time. Four chords, slow and steady.": "Une douce chanson folklorique en 3/4. Quatre accords, lente et régulière.",
+    "One chord per bar. Let the last strum ring while you move to the next chord.": "Un accord par mesure. Laissez le dernier coup de gratte résonner pendant que vous passez à l'accord suivant.",
+    "Scarborough Fair": "Foire de Scarborough",
+    "An old English ballad in A minor. The D chord adds a bright lift.": "Une ancienne ballade anglaise en la mineur. L'accord de ré apporte une touche lumineuse.",
+    "Keep the Am shape relaxed as you move to G. The D chord is the surprise at the end of each phrase.": "Gardez la forme de la mineur détendue en passant à sol. L'accord de ré est la surprise à la fin de chaque phrase.",
+    "Ode to Joy": "Ode à la joie",
+    "Beethoven's famous melody, played on the C string with the first five notes of the scale.": "La célèbre mélodie de Beethoven, jouée sur la corde de do avec les cinq premières notes de la gamme.",
+    "Play each note with a relaxed finger. Let the phrase breathe at the end of each line.": "Jouez chaque note avec un doigt détendu. Laissez la phrase respirer à la fin de chaque ligne."
   };
 
   function detectDefaultLang() {

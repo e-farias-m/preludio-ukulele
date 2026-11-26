@@ -71,7 +71,19 @@ const CURRICULUM = {
       lessons: [
         { id: 'f', type: 'chord', title: 'F', chord: 'F',
           description: 'F uses two fingers: middle on the G string, index on the E string.',
-          prompt: 'Middle finger on G string 2nd fret; index finger on E string 1st fret. Strum all four strings.' }
+          prompt: 'Middle finger on G string 2nd fret; index finger on E string 1st fret. Strum all four strings.' },
+        { id: 'frere-jacques', type: 'song', songKind: 'chord', title: 'Frère Jacques',
+          bpm: 92, timeSig: { num: 4, den: 4 },
+          bars: ['C', 'C', 'C', 'C', 'F', 'F', 'C', 'C', 'F', 'C', 'F', 'C'],
+          strum: ['D', 'D', 'D', 'U'],
+          description: 'A French folk round you can play with just C and F.',
+          prompt: 'Strum C for the first four bars, then follow the chart. Change chords on the first beat of each bar.' },
+        { id: 'first-blues', type: 'song', songKind: 'chord', title: 'First Blues',
+          bpm: 76, timeSig: { num: 4, den: 4 },
+          bars: ['C7', 'C7', 'C7', 'C7', 'F', 'F', 'C7', 'C7'],
+          strum: ['D', 'D', 'D', 'D'],
+          description: 'A slow eight-bar blues using C7 and F. The seventh gives it a bluesy colour.',
+          prompt: 'Four bars of C7, two of F, then back to C7. Let each strum ring.' }
       ]
     },
     {
@@ -81,7 +93,19 @@ const CURRICULUM = {
       lessons: [
         { id: 'g7', type: 'chord', title: 'G7', chord: 'G7',
           description: 'G7 adds a bluesy pull back to C.',
-          prompt: 'Middle on C string 2nd fret, index on E string 1st fret, ring on A string 2nd fret.' }
+          prompt: 'Middle on C string 2nd fret, index on E string 1st fret, ring on A string 2nd fret.' },
+        { id: 'saints', type: 'song', songKind: 'chord', title: 'When the Saints Go Marching In',
+          bpm: 100, timeSig: { num: 4, den: 4 },
+          bars: ['C', 'F', 'C', 'G7', 'C', 'F', 'G7', 'C', 'C', 'F', 'C', 'G7', 'C', 'F', 'G7', 'C'],
+          strum: ['D', 'D', 'U', 'D'],
+          description: 'A traditional spiritual. Three chords and a marching pulse.',
+          prompt: 'Keep your strumming hand moving in steady quarter notes. Change chords on the first beat of the bar.' },
+        { id: 'la-bamba', type: 'song', songKind: 'chord', title: 'La Bamba',
+          bpm: 104, timeSig: { num: 4, den: 4 },
+          bars: ['C', 'F', 'G7', 'C', 'C', 'F', 'G7', 'C', 'C', 'F', 'G7', 'C', 'C', 'F', 'G7', 'C'],
+          strum: ['D', 'D', 'U', 'D'],
+          description: 'A traditional son jarocho from Veracruz, Mexico. Three chords, fast and festive.',
+          prompt: 'C, F, G7, C — one bar each. Keep the changes crisp and the strum relaxed.' }
       ]
     },
     {
@@ -94,7 +118,13 @@ const CURRICULUM = {
           prompt: 'Middle finger on G string 2nd fret. Strum all four strings.' },
         { id: 'g', type: 'chord', title: 'G', chord: 'G',
           description: 'G is the V chord in C major.',
-          prompt: 'Index on C string 2nd fret, ring on E string 3rd fret, middle on A string 2nd fret.' }
+          prompt: 'Index on C string 2nd fret, ring on E string 3rd fret, middle on A string 2nd fret.' },
+        { id: 'water-is-wide', type: 'song', songKind: 'chord', title: 'The Water Is Wide',
+          bpm: 72, timeSig: { num: 3, den: 4 },
+          bars: ['C', 'F', 'C', 'Am', 'G', 'C', 'F', 'G', 'C', 'F', 'C', 'Am', 'G', 'C', 'F', 'C'],
+          strum: ['D', 'D', 'U'],
+          description: 'A gentle folk song in 3/4 time. Four chords, slow and steady.',
+          prompt: 'One chord per bar. Let the last strum ring while you move to the next chord.' }
       ]
     },
     {
@@ -119,7 +149,13 @@ const CURRICULUM = {
           prompt: 'Middle on G string 2nd fret, index on E string 2nd fret.' },
         { id: 'a7', type: 'chord', title: 'A7', chord: 'A7',
           description: 'A7 is the V7 of D.',
-          prompt: 'Index on C string 1st fret.' }
+          prompt: 'Index on C string 1st fret.' },
+        { id: 'scarborough-fair', type: 'song', songKind: 'chord', title: 'Scarborough Fair',
+          bpm: 84, timeSig: { num: 3, den: 4 },
+          bars: ['Am', 'G', 'Am', 'C', 'Am', 'G', 'Am', 'D', 'Am', 'G', 'Am', 'C', 'Am', 'G', 'D', 'Am'],
+          strum: ['D', 'D', 'U'],
+          description: 'An old English ballad in A minor. The D chord adds a bright lift.',
+          prompt: 'Keep the Am shape relaxed as you move to G. The D chord is the surprise at the end of each phrase.' }
       ]
     },
     {
@@ -147,6 +183,42 @@ const CURRICULUM = {
           string: 1, fret: 7, freq: 392.00, quizKind: 'note',
           description: 'G is seven frets up.',
           prompt: 'Press the C string at the 7th fret.' },
+        { id: 'ode-to-joy', type: 'song', songKind: 'melody', title: 'Ode to Joy',
+          bpm: 100, timeSig: { num: 4, den: 4 },
+          notes: [
+            { note: 'E', string: 1, fret: 4, beats: 1 },
+            { note: 'E', string: 1, fret: 4, beats: 1 },
+            { note: 'F', string: 1, fret: 5, beats: 1 },
+            { note: 'G', string: 1, fret: 7, beats: 1 },
+            { note: 'G', string: 1, fret: 7, beats: 1 },
+            { note: 'F', string: 1, fret: 5, beats: 1 },
+            { note: 'E', string: 1, fret: 4, beats: 1 },
+            { note: 'D', string: 1, fret: 2, beats: 1 },
+            { note: 'C', string: 1, fret: 0, beats: 1 },
+            { note: 'C', string: 1, fret: 0, beats: 1 },
+            { note: 'D', string: 1, fret: 2, beats: 1 },
+            { note: 'E', string: 1, fret: 4, beats: 1 },
+            { note: 'E', string: 1, fret: 4, beats: 1.5 },
+            { note: 'D', string: 1, fret: 2, beats: 0.5 },
+            { note: 'D', string: 1, fret: 2, beats: 2 },
+            { note: 'E', string: 1, fret: 4, beats: 1 },
+            { note: 'E', string: 1, fret: 4, beats: 1 },
+            { note: 'F', string: 1, fret: 5, beats: 1 },
+            { note: 'G', string: 1, fret: 7, beats: 1 },
+            { note: 'G', string: 1, fret: 7, beats: 1 },
+            { note: 'F', string: 1, fret: 5, beats: 1 },
+            { note: 'E', string: 1, fret: 4, beats: 1 },
+            { note: 'D', string: 1, fret: 2, beats: 1 },
+            { note: 'C', string: 1, fret: 0, beats: 1 },
+            { note: 'C', string: 1, fret: 0, beats: 1 },
+            { note: 'D', string: 1, fret: 2, beats: 1 },
+            { note: 'E', string: 1, fret: 4, beats: 1 },
+            { note: 'D', string: 1, fret: 2, beats: 1.5 },
+            { note: 'C', string: 1, fret: 0, beats: 0.5 },
+            { note: 'C', string: 1, fret: 0, beats: 2 }
+          ],
+          description: "Beethoven's famous melody, played on the C string with the first five notes of the scale.",
+          prompt: 'Play each note with a relaxed finger. Let the phrase breathe at the end of each line.' },
         { id: 'a4', type: 'note', title: 'A', note: 'A', octave: 4,
           string: 1, fret: 9, freq: 440.00, quizKind: 'note',
           description: 'A is nine frets up.',

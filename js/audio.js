@@ -20,7 +20,7 @@
     Audio.ready=true;
     return Audio.ctx;
   }
-  function pluck(freq,when,gain){
+  function pluck(freq,when,gain,dest){
     var ctx=ensureCtx();
     if(!ctx) return;
     var t0=ctx.currentTime+(when==null?0.02:when);
@@ -33,7 +33,7 @@
     g.gain.exponentialRampToValueAtTime(level,t0+0.01);
     g.gain.exponentialRampToValueAtTime(0.001,t0+1.2);
     osc.connect(g);
-    g.connect(Audio.master);
+    g.connect(dest||Audio.master);
     osc.start(t0);
     osc.stop(t0+1.3);
   }
@@ -42,28 +42,77 @@
     if(!base) return 0;
     return base*Math.pow(2,(fret||0)/12);
   }
-  function strum(freqs,opts){
-    opts=opts||{};
-    var list=(opts.down?freqs.slice():freqs.slice().reverse());
-    list.forEach(function(f,i){
-      if(f) pluck(f,0.02+i*0.045,0.32);
-    });
-  }
-  function playChord(chord){
-    if(!chord || !chord.frets) return;
+  function chordFreqs(chord){
+    if(!chord || !chord.frets) return [];
     var freqs=[];
     chord.frets.forEach(function(f,i){
       if(f>=0) freqs.push(noteFreq(i,f));
     });
-    strum(freqs,{down:true});
+    return freqs;
+  }
+  function strum(freqs,opts){
+    opts=opts||{};
+    var list=(opts.down===false?freqs.slice().reverse():freqs.slice());
+    var base=(opts.when==null?0.02:opts.when);
+    var gain=(opts.gain==null?0.32:opts.gain);
+    list.forEach(function(f,i){
+      if(f) pluck(f,base+i*0.045,gain,opts.dest);
+    });
+  }
+  function playChord(chord,opts){
+    var o=opts||{};
+    strum(chordFreqs(chord),{down:true,when:o.when,gain:o.gain,dest:o.dest});
+  }
+  function click(accent,when,dest){
+    var ctx=ensureCtx();
+    if(!ctx) return;
+    var t0=ctx.currentTime+(when==null?0.02:when);
+    var osc=ctx.createOscillator();
+    var g=ctx.createGain();
+    osc.type='triangle';
+    osc.frequency.value=accent?1568:1046;
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.exponentialRampToValueAtTime(accent?0.2:0.13,t0+0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+0.07);
+    osc.connect(g);
+    g.connect(dest||Audio.master);
+    osc.start(t0);
+    osc.stop(t0+0.09);
+  }
+  function createBus(){
+    var ctx=ensureCtx();
+    if(!ctx) return null;
+    var g=ctx.createGain();
+    g.gain.value=1;
+    g.connect(Audio.master);
+    return g;
+  }
+  function stopBus(bus){
+    if(!bus) return;
+    var ctx=ensureCtx();
+    if(!ctx) return;
+    try{
+      var now=ctx.currentTime;
+      bus.gain.cancelScheduledValues(now);
+      bus.gain.setValueAtTime(bus.gain.value,now);
+      bus.gain.exponentialRampToValueAtTime(0.0001,now+0.08);
+      setTimeout(function(){ try{ bus.disconnect(); }catch(e){} },160);
+    }catch(e){
+      try{ bus.disconnect(); }catch(e2){}
+    }
   }
   var AudioAPI={
     init:ensureCtx,
+    getContext:function(){ return ensureCtx(); },
     play:pluck,
     pluck:pluck,
     strum:strum,
+    click:click,
     playChord:playChord,
-    noteFreq:noteFreq
+    noteFreq:noteFreq,
+    chordFreqs:chordFreqs,
+    createBus:createBus,
+    stopBus:stopBus
   };
   if(typeof window!=='undefined') window.Audio=AudioAPI;
   if(typeof module!=='undefined' && module.exports) module.exports=AudioAPI;
