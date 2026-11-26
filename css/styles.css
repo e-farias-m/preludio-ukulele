@@ -6,7 +6,7 @@ button { padding:8px 16px; border-radius:8px; border:1px solid #c4bdb3; backgrou
 button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
 h1 { font-size:24px; margin-bottom:12px; }
 .fretboard { margin:16px 0; display:flex; justify-content:center; }
-.fretboard svg { width:100%; max-width:220px; height:auto; }
+.fretboard svg { width:100%; max-width:420px; height:auto; }
 .string { stroke:#8b7355; stroke-width:2; }
 .fret { stroke:#c4bdb3; stroke-width:1; }
 .dot { fill:var(--accent); }

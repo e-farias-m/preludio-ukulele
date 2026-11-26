@@ -1,53 +1,46 @@
 (function(){
   'use strict';
   function fretboard(fret, string){
-    // Vertical ukulele: headstock top, body bottom.
-    var w=200, h=420;
-    var neckLeft=70, neckRight=130, neckW=60;
-    var nutY=60;
-    var fretSpacing=22;
+    var w=400, h=120;
+    var nutX=12;
+    var fretSpacing=26;
     var numFrets=12;
-    var bodyY=60+numFrets*fretSpacing+20;
+    var bodyX=12+numFrets*fretSpacing+16;
     var s='<svg viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg">';
     // headstock
-    s+='<rect x="75" y="0" width="50" height="50" rx="6" fill="#8b7355" stroke="#5e3a1f" stroke-width="1.5"/>';
-    // tuning pegs
+    s+='<rect x="0" y="30" width="12" height="60" rx="4" fill="#8b7355" stroke="#5e3a1f" stroke-width="1.5"/>';
     for(var p=0;p<4;p++){
-      var px = p<2 ? 82 : 118;
-      var py = 12 + (p%2)*26;
-      s+='<circle cx="'+px+'" cy="'+py+'" r="6" fill="#c4bdb3" stroke="#5e3a1f" stroke-width="1"/>';
+      var py=34+p*14;
+      s+='<circle cx="6" cy="'+py+'" r="4" fill="#c4bdb3" stroke="#5e3a1f" stroke-width="1"/>';
     }
     // neck
-    s+='<rect x="'+neckLeft+'" y="50" width="'+neckW+'" height="'+(numFrets*fretSpacing+10)+'" fill="#c8965a" stroke="#5e3a1f" stroke-width="1.5"/>';
+    s+='<rect x="'+nutX+'" y="20" width="'+(numFrets*fretSpacing)+'" height="80" fill="#c8965a" stroke="#5e3a1f" stroke-width="1.5"/>';
     // nut
-    s+='<rect x="'+neckLeft+'" y="50" width="'+neckW+'" height="4" fill="#f5f1eb" stroke="#5e3a1f" stroke-width="1"/>';
+    s+='<rect x="'+nutX+'" y="20" width="4" height="80" fill="#f5f1eb" stroke="#5e3a1f" stroke-width="1"/>';
     // frets
     for(var f=1;f<=numFrets;f++){
-      var fy=50+f*fretSpacing;
-      s+='<line x1="'+neckLeft+'" y1="'+fy+'" x2="'+neckRight+'" y2="'+fy+'" stroke="#c4bdb3" stroke-width="1.5"/>';
+      var fx=nutX+f*fretSpacing;
+      s+='<line x1="'+fx+'" y1="20" x2="'+fx+'" y2="100" stroke="#c4bdb3" stroke-width="1.5"/>';
     }
     // fret markers (dots) at 3,5,7,10,12
     [3,5,7,10,12].forEach(function(fr){
-      var fy=50+fr*fretSpacing - fretSpacing/2;
-      s+='<circle cx="100" cy="'+fy+'" r="3" fill="#5e3a1f"/>';
-      if(fr===12){ s+='<circle cx="85" cy="'+fy+'" r="3" fill="#5e3a1f"/><circle cx="115" cy="'+fy+'" r="3" fill="#5e3a1f"/>'; }
+      var fx=nutX+fr*fretSpacing - fretSpacing/2;
+      s+='<circle cx="'+fx+'" cy="60" r="3" fill="#5e3a1f"/>';
+      if(fr===12){ s+='<circle cx="'+fx+'" cy="40" r="3" fill="#5e3a1f"/><circle cx="'+fx+'" cy="80" r="3" fill="#5e3a1f"/>'; }
     });
     // strings
     for(var st=0;st<4;st++){
-      var sx=neckLeft+10+st*13.33;
-      s+='<line x1="'+sx+'" y1="54" x2="'+sx+'" y2="'+(50+numFrets*fretSpacing+4)+'" stroke="#8b7355" stroke-width="1.5"/>';
+      var sy=28+st*14.67;
+      s+='<line x1="'+nutX+'" y1="'+sy+'" x2="'+(nutX+numFrets*fretSpacing)+'" y2="'+sy+'" stroke="#8b7355" stroke-width="1.5"/>';
     }
-    // body (figure-eight approximated by two circles)
-    var bodyCx=100, bodyCy=bodyY+60;
-    s+='<ellipse cx="'+bodyCx+'" cy="'+(bodyY+30)+'" rx="45" ry="35" fill="#c8965a" stroke="#5e3a1f" stroke-width="1.5"/>';
-    s+='<ellipse cx="'+bodyCx+'" cy="'+(bodyY+90)+'" rx="55" ry="45" fill="#c8965a" stroke="#5e3a1f" stroke-width="1.5"/>';
-    // sound hole (simple circle)
-    s+='<circle cx="'+bodyCx+'" cy="'+(bodyY+90)+'" r="18" fill="#2d3748" stroke="#5e3a1f" stroke-width="1.5"/>';
+    // body (ellipse + sound hole)
+    s+='<ellipse cx="'+(bodyX+40)+'" cy="60" rx="45" ry="50" fill="#c8965a" stroke="#5e3a1f" stroke-width="1.5"/>';
+    s+='<circle cx="'+(bodyX+40)+'" cy="60" r="16" fill="#2d3748" stroke="#5e3a1f" stroke-width="1.5"/>';
     // note dot
     if(typeof fret==='number' && typeof string==='number'){
-      var fx=neckLeft+10+string*13.33;
-      var fy = (fret===0) ? 52 : (50 + fret*fretSpacing - fretSpacing/2);
-      s+='<circle cx="'+fx+'" cy="'+fy+'" r="8" fill="#c05621" stroke="#fff" stroke-width="2"/>';
+      var dx = (fret===0) ? (nutX+2) : (nutX + fret*fretSpacing - fretSpacing/2);
+      var dy = 28 + string*14.67;
+      s+='<circle cx="'+dx+'" cy="'+dy+'" r="7" fill="#c05621" stroke="#fff" stroke-width="2"/>';
     }
     s+='</svg>';
     return s;
