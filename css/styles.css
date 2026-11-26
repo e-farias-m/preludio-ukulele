@@ -1,0 +1,12 @@
+:root { --bg:#f5f1eb; --fg:#2d3748; --accent:#c05621; --muted:#718096; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:system-ui,sans-serif; background:var(--bg); color:var(--fg); }
+.app { max-width:600px; margin:0 auto; padding:16px; }
+button { padding:8px 16px; border-radius:8px; border:1px solid #c4bdb3; background:#fff; cursor:pointer; }
+button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+h1 { font-size:24px; margin-bottom:12px; }
+.fretboard { margin:16px 0; }
+.string { stroke:#8b7355; stroke-width:2; }
+.fret { stroke:#c4bdb3; stroke-width:1; }
+.dot { fill:var(--accent); }
+.note-label { font-size:14px; text-anchor:middle; }
