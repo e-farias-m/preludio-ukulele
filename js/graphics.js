@@ -2,7 +2,7 @@
   'use strict';
   function fretboard(fret, string, note){
     var nutX=31.3, fretSpacing=4.23;
-    var stringY=[61.3,66.8,72.4,77.9];
+    var stringY=[77.9,72.4,66.8,61.3];
     var dx = (fret===0) ? nutX : (nutX + fret*fretSpacing - fretSpacing/2);
     var dy = stringY[string] || 50;
     var label = note || '';
@@ -14,7 +14,7 @@
   }
   function chordDiagram(chord){
     var nutX=31.3, fretSpacing=4.23;
-    var stringY=[61.3,66.8,72.4,77.9];
+    var stringY=[77.9,72.4,66.8,61.3];
     var s='<div style="position:relative;display:inline-block;max-width:100%">';
     s+='<img src="images/instruments/fretboard.jpg" alt="Ukulele fretboard" style="width:100%;height:auto;display:block;border-radius:8px;">';
     s+='<div style="position:absolute;left:4%;top:5%;font-size:16px;font-weight:700;color:#000;background:rgba(255,255,255,0.8);padding:2px 6px;border-radius:4px;">'+chord.name+'</div>';
