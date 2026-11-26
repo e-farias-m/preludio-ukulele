@@ -1,14 +1,89 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><title>Hotspot Picker</title>
-<style>body{font-family:system-ui;margin:16px;background:#f5f1eb;color:#2d3748}#stage{position:relative;display:inline-block;border:2px solid #c4bdb3;background:#fff}#img{display:block;max-width:90vw;max-height:70vh}#coords{font-size:13px;color:#718096;margin:8px 0}textarea{width:100%;height:120px;font-family:monospace;font-size:12px}</style></head><body>
-<h1>Hotspot Picker</h1>
-<input type="file" id="file" accept="image/*">
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Fret Hotspot Picker</title>
+<style>
+  body{font-family:system-ui,sans-serif;margin:16px;background:#f5f1eb;color:#2d3748}
+  h1{font-size:18px;margin:0 0 8px}
+  p.hint{font-size:13px;color:#4a5568;margin:0 0 12px;max-width:760px;line-height:1.5}
+  #stage{position:relative;display:inline-block;border:2px solid #c4bdb3;background:#fff;cursor:crosshair;line-height:0}
+  #img{display:block;max-width:90vw;max-height:65vh;user-select:none}
+  .marker{position:absolute;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid #000;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+  #coords{font-size:13px;color:#718096;margin:8px 0;font-variant-numeric:tabular-nums}
+  .row{display:flex;gap:8px;margin:8px 0;flex-wrap:wrap}
+  button{font:inherit;padding:6px 12px;border-radius:6px;border:1px solid #c4bdb3;background:#fff;cursor:pointer}
+  button.primary{background:#2d3748;color:#fff;border-color:#2d3748}
+  #list{font-size:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;background:#fff;border:1px solid #c4bdb3;border-radius:6px;padding:8px;min-height:40px;max-width:760px;margin:0}
+</style>
+</head>
+<body>
+<h1>Fret Hotspot Picker</h1>
+<p class="hint">
+  Click the spot where the note circle should sit, <strong>in order</strong>:
+  <strong>fret 0 (nut), fret 1, fret 2, … fret 12</strong>.<br>
+  Use the middle of the neck (the C string line works well). For fret 0, click the nut — the white bar at the left edge.
+  Then copy the JSON at the bottom and send it.
+</p>
+<div id="stage"><img id="img" src="../images/instruments/fretboard.jpg" alt="Fretboard"></div>
 <p id="coords">x: — , y: —</p>
-<div id="stage"><img id="img" alt=""></div>
-<textarea id="out" readonly></textarea>
+<div class="row">
+  <button id="undo">Undo</button>
+  <button id="clear">Clear</button>
+  <button id="copy" class="primary">Copy JSON</button>
+</div>
+<pre id="list"></pre>
 <script>
-const img=document.getElementById('img'),stage=document.getElementById('stage'),coords=document.getElementById('coords'),out=document.getElementById('out');
-let pts=[];
-document.getElementById('file').addEventListener('change',e=>{const f=e.target.files[0]; if(f) img.src=URL.createObjectURL(f);});
-stage.addEventListener('mousemove',e=>{const r=img.getBoundingClientRect(); coords.textContent='x: '+((e.clientX-r.left)/r.width*100).toFixed(1)+' , y: '+((e.clientY-r.top)/r.height*100).toFixed(1);});
-stage.addEventListener('click',e=>{const r=img.getBoundingClientRect(); const x=+((e.clientX-r.left)/r.width*100).toFixed(1); const y=+((e.clientY-r.top)/r.height*100).toFixed(1); pts.push({x,y}); out.value=JSON.stringify(pts,null,2);});
-</script></body></html>
+  var img = document.getElementById('img');
+  var stage = document.getElementById('stage');
+  var coords = document.getElementById('coords');
+  var list = document.getElementById('list');
+  var pts = [];
+
+  function pct(e) {
+    var r = img.getBoundingClientRect();
+    return {
+      x: +(((e.clientX - r.left) / r.width) * 100).toFixed(1),
+      y: +(((e.clientY - r.top) / r.height) * 100).toFixed(1)
+    };
+  }
+
+  stage.addEventListener('mousemove', function (e) {
+    var p = pct(e);
+    coords.textContent = 'x: ' + p.x + ' , y: ' + p.y;
+  });
+
+  stage.addEventListener('click', function (e) {
+    pts.push(pct(e));
+    render();
+  });
+
+  function render() {
+    stage.querySelectorAll('.marker').forEach(function (m) { m.remove(); });
+    pts.forEach(function (p, i) {
+      var m = document.createElement('span');
+      m.className = 'marker';
+      m.style.left = p.x + '%';
+      m.style.top = p.y + '%';
+      m.textContent = i;
+      stage.appendChild(m);
+    });
+    list.textContent = JSON.stringify(pts, null, 2);
+  }
+
+  document.getElementById('undo').onclick = function () { pts.pop(); render(); };
+  document.getElementById('clear').onclick = function () { pts = []; render(); };
+  document.getElementById('copy').onclick = function () {
+    var txt = JSON.stringify(pts, null, 2);
+    if (navigator.clipboard) navigator.clipboard.writeText(txt);
+    else {
+      var ta = document.createElement('textarea');
+      ta.value = txt; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); ta.remove();
+    }
+  };
+
+  render();
+</script>
+</body>
+</html>
