@@ -4,10 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Preludio Ukulele</title>
+<meta name="description" content="Learn ukulele chords, notes, and songs one gentle step at a time.">
+<meta name="theme-color" content="#2b6cb0">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-<div id="app" class="app"></div>
+<a class="skip-link" href="#app">Skip to content</a>
+<main id="app" class="app" tabindex="-1"></main>
 <div id="practice-tools"></div>
 <script src="js/i18n.js"></script>
 <script src="js/curriculum.js"></script>
@@ -16,5 +21,12 @@
 <script src="js/graphics.js"></script>
 <script src="js/practice.js"></script>
 <script src="js/app.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js', { scope: './' }).catch(function () { /* offline support unavailable */ });
+    });
+  }
+</script>
 </body>
 </html>

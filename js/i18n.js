@@ -110,6 +110,12 @@
     "Ready for a challenge?": "Pronto para um desafio?",
     "Timed games and tools to keep you sharp.": "Jogos cronometrados e ferramentas para manter o ritmo.",
     "No practice recorded yet.": "Nenhum treino registrado ainda.",
+    "Skip to content": "Ir para o conteúdo",
+    "Appearance": "Aparência",
+    "Switch to light theme": "Mudar para o tema claro",
+    "Switch to dark theme": "Mudar para o tema escuro",
+    "Install app": "Instalar aplicativo",
+    "Add Preludio Ukulele to your home screen.": "Adicione o Preludio Ukulele à sua tela inicial.",
 
     // Unit titles
     "Open strings": "Cordas soltas",
@@ -353,6 +359,12 @@
     "Ready for a challenge?": "Prêt pour un défi ?",
     "Timed games and tools to keep you sharp.": "Jeux chronométrés et outils pour rester affûté.",
     "No practice recorded yet.": "Aucun exercice enregistré pour le moment.",
+    "Skip to content": "Aller au contenu",
+    "Appearance": "Apparence",
+    "Switch to light theme": "Passer au thème clair",
+    "Switch to dark theme": "Passer au thème sombre",
+    "Install app": "Installer l'application",
+    "Add Preludio Ukulele to your home screen.": "Ajoutez Preludio Ukulele à votre écran d'accueil.",
 
     // Unit titles
     "Open strings": "Cordes à vide",

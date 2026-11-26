@@ -2,6 +2,7 @@
   'use strict';
 
   var SONG_SPEED_KEY = 'preludioUkuleleSongSpeed';
+  var THEME_KEY = 'preludioUkuleleTheme';
   var SPEED_MIN = 0.5;
   var SPEED_MAX = 1.0;
   var SPEED_STEP = 0.1;
@@ -56,6 +57,19 @@
     return Math.min(SPEED_MAX, Math.max(SPEED_MIN, Math.round(v * 10) / 10));
   }
 
+  function getSavedTheme() {
+    try { return localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light'; }
+    catch (e) { return 'light'; }
+  }
+  function setTheme(theme) {
+    var value = theme === 'dark' ? 'dark' : 'light';
+    try { localStorage.setItem(THEME_KEY, value); } catch (e) { /* ignore */ }
+    document.documentElement.setAttribute('data-theme', value);
+  }
+  function applySavedTheme() { setTheme(getSavedTheme()); }
+
+  var installPrompt = null;
+
   function t(s) { return (typeof window.t === 'function') ? window.t(s) : s; }
   function esc(s) {
     return String(s == null ? '' : s)
@@ -100,6 +114,8 @@
   function render(keepScroll) {
     var app = appEl();
     if (!app) return;
+    var skip = document.querySelector('.skip-link');
+    if (skip) skip.textContent = t('Skip to content');
     if (APP.screen === 'map') app.innerHTML = renderMap();
     else if (APP.screen === 'lesson') app.innerHTML = renderLesson();
     else if (APP.screen === 'first-sound') app.innerHTML = renderFirstSound();
@@ -189,7 +205,7 @@
       html += '</div></section>';
     });
 
-    html += '<footer class="app-footer">Preludio Ukulele · v0.4 · © 2026 Eduardo de Farias Machado. All rights reserved. <a href="LICENSE">Licence</a> · <a href="THIRD_PARTY_NOTICES.md">Third-party notices</a></footer>';
+    html += '<footer class="app-footer">Preludio Ukulele · v0.5 · © 2026 Eduardo de Farias Machado. All rights reserved. <a href="LICENSE">Licence</a> · <a href="THIRD_PARTY_NOTICES.md">Third-party notices</a></footer>';
     html += '</div>';
     return html;
   }
@@ -794,6 +810,16 @@
     html += langBtn('pt', 'Português (BR)');
     html += langBtn('fr', 'Français (CA)');
     html += '</div></div>';
+    html += '<div class="settings-section"><h2>' + t('Appearance') + '</h2>';
+    html += '<button class="btn secondary wide" data-action="toggle-theme">' +
+      (getSavedTheme() === 'dark' ? t('Switch to light theme') : t('Switch to dark theme')) + '</button>';
+    html += '</div>';
+    if (installPrompt) {
+      html += '<div class="settings-section"><h2>' + t('Install app') + '</h2>';
+      html += '<button class="btn secondary wide" data-action="install-app">' + t('Install app') + '</button>';
+      html += '<p class="settings-note">' + t('Add Preludio Ukulele to your home screen.') + '</p>';
+      html += '</div>';
+    }
     html += '<div class="settings-section"><h2>' + t('Practice') + '</h2>';
     html += '<button class="btn secondary wide" data-action="open-first-sound">♪ ' + t('Replay first sounds') + '</button>';
     html += '<button class="btn danger wide" data-action="reset-progress">' + t('Reset all progress') + '</button>';
@@ -838,9 +864,28 @@
     else if (action === 'open-settings') { APP.screen = 'settings'; render(); }
     else if (action === 'close-settings') goMap();
     else if (action === 'set-lang') { if (typeof window.setLang === 'function') window.setLang(target.getAttribute('data-lang')); render(); }
+    else if (action === 'toggle-theme') { setTheme(getSavedTheme() === 'dark' ? 'light' : 'dark'); render(true); }
+    else if (action === 'install-app') {
+      if (installPrompt) {
+        installPrompt.prompt();
+        installPrompt = null;
+        render(true);
+      }
+    }
     else if (action === 'reset-progress') { if (window.confirm(t('Reset all progress?'))) { Progress.reset(); goMap(); } }
   });
 
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    installPrompt = e;
+    if (APP.screen === 'settings') render(true);
+  });
+  window.addEventListener('appinstalled', function () {
+    installPrompt = null;
+    if (APP.screen === 'settings') render(true);
+  });
+
+  applySavedTheme();
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render);
   else render();
 

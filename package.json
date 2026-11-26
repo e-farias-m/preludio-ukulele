@@ -1,0 +1,10 @@
+{
+  "name": "preludio-ukulele",
+  "version": "0.5.0",
+  "private": true,
+  "description": "A gentle, step-by-step ukulele learning app.",
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  },
+  "license": "SEE LICENSE IN LICENSE"
+}

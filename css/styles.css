@@ -3,7 +3,7 @@
   --surface: #fffdf9;
   --surface-2: #ffffff;
   --fg: #2d3748;
-  --muted: #718096;
+  --muted: #5a6678;
   --accent: #2b6cb0;
   --accent-dark: #2c5282;
   --accent-soft: #e3f0fb;
@@ -212,7 +212,7 @@ button { font: inherit; color: inherit; }
 .stars .filled { color: var(--gold); }
 .stars .empty { color: #d9d2c6; }
 
-.app-footer { text-align: center; font-size: 11px; color: #a0aec0; padding: 12px 0 4px; }
+.app-footer { text-align: center; font-size: 11px; color: var(--muted); padding: 12px 0 4px; }
 .app-footer a { color: inherit; text-decoration: underline; }
 
 /* ── Lesson screen ──────────────────────────────────────────────────── */
@@ -764,3 +764,114 @@ button { font: inherit; color: inherit; }
   .count-in-beats span { font-size: 26px; }
   .song-controls .btn { padding: 10px 12px; font-size: 14px; }
 }
+
+/* ── Accessibility ──────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+#app:focus { outline: none; }
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 10px;
+  z-index: 100;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+.skip-link:focus { left: 12px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Dark theme ─────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #121821;
+  --surface: #1a2330;
+  --surface-2: #202b3a;
+  --fg: #e8eef5;
+  --muted: #a0adbd;
+  --accent: #79b8f0;
+  --accent-dark: #2c5282;
+  --accent-soft: #1b334d;
+  --accent-shadow: rgba(121, 184, 240, .18);
+  --border: #37465a;
+  --gold: #f0bd55;
+  --success: #6dd39a;
+  --danger: #ff8f8f;
+}
+[data-theme="dark"] body { background: var(--bg); color: var(--fg); }
+[data-theme="dark"] .btn.primary,
+[data-theme="dark"] .tool-fab {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+  color: #fff;
+}
+[data-theme="dark"] .btn.primary:hover { background: #37639c; border-color: #37639c; }
+[data-theme="dark"] .continue-card { background: linear-gradient(135deg, var(--accent-dark), #1d3e63); }
+[data-theme="dark"] .continue-card .btn.primary { background: #fff; color: #16324f; }
+[data-theme="dark"] .continue-card.done { background: linear-gradient(135deg, #3a4658, #222b38); }
+[data-theme="dark"] .btn.secondary,
+[data-theme="dark"] .icon-btn,
+[data-theme="dark"] .lang-btn,
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .prompt-box,
+[data-theme="dark"] .lesson-node,
+[data-theme="dark"] .song-chart,
+[data-theme="dark"] .song-tab-wrap,
+[data-theme="dark"] .song-chord-card,
+[data-theme="dark"] .sprint-card,
+[data-theme="dark"] .chart-card,
+[data-theme="dark"] .chart-tab,
+[data-theme="dark"] .game-option,
+[data-theme="dark"] .game-timer,
+[data-theme="dark"] .game-score,
+[data-theme="dark"] .quiz-option,
+[data-theme="dark"] .tool-pill,
+[data-theme="dark"] .tool-select,
+[data-theme="dark"] .btn-speed,
+[data-theme="dark"] .chart-hear,
+[data-theme="dark"] .tool-close {
+  background: var(--surface);
+  color: var(--fg);
+  border-color: var(--border);
+}
+[data-theme="dark"] .first-sound-cta,
+[data-theme="dark"] .practice-banner { background: var(--surface); border-color: var(--border); }
+[data-theme="dark"] .lesson-node.completed { border-color: #2f6b4b; background: #172b22; }
+[data-theme="dark"] .chart-card.learned { border-color: #3a6a9b; background: var(--accent-soft); }
+[data-theme="dark"] .btn.danger,
+[data-theme="dark"] .quiz-option.wrong,
+[data-theme="dark"] .game-option.wrong { background: #3a2024; color: var(--danger); border-color: #7d363e; }
+[data-theme="dark"] .quiz-option.correct { background: #17342a; color: var(--success); border-color: #2f855a; }
+[data-theme="dark"] .unit-bar { background: var(--border); }
+[data-theme="dark"] .song-bar { background: var(--surface-2); border-color: var(--border); }
+[data-theme="dark"] .song-beat { background: var(--border); }
+[data-theme="dark"] .strum-arrow.up { background: var(--accent-soft); color: var(--accent); }
+[data-theme="dark"] .strum-arrow.rest { color: var(--muted); }
+[data-theme="dark"] .tab-note rect { fill: var(--surface-2); stroke: #cbd5e0; }
+[data-theme="dark"] .tab-note-name-bg { fill: var(--surface-2); }
+[data-theme="dark"] .tab-fret { fill: var(--fg); }
+[data-theme="dark"] .tab-note-name { fill: var(--muted); }
+[data-theme="dark"] .tab-note.active rect { fill: #6b4a0e; stroke: var(--gold); }
+[data-theme="dark"] .tab-note.active .tab-fret { fill: #ffe6a8; }
+[data-theme="dark"] .count-in-overlay { background: rgba(18, 24, 33, .88); }
+[data-theme="dark"] .count-in-beats span { color: var(--muted); }
+[data-theme="dark"] .metro-dot { background: var(--border); }
+[data-theme="dark"] .metro-dot.downbeat { background: #4a5b70; }
+[data-theme="dark"] .tool-panel { background: var(--surface); border-color: var(--border); }
+[data-theme="dark"] .stars .empty,
+[data-theme="dark"] .lock-icon,
+[data-theme="dark"] .app-footer { color: var(--muted); }
