@@ -8,7 +8,7 @@
     app.innerHTML=
       '<h1>'+t('Preludio Ukulele')+'</h1>'+
       '<p>Lesson '+(APP.lesson+1)+' of '+CURRICULUM.lessons.length+'</p>'+
-      '<div class="fretboard">'+Graphics.fretboard(L.fret,L.string)+'</div>'+
+      '<div class="fretboard">'+Graphics.fretboard(L.fret,L.string,L.note)+'</div>'+
       '<p>Note: '+L.note+L.octave+' (string '+(L.string+1)+', fret '+L.fret+')</p>'+
       '<div style="display:flex;gap:8px;margin-top:12px">'+
         '<button class="primary" id="playBtn">'+t('Listen')+'</button>'+
