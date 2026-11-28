@@ -792,6 +792,21 @@ button { font: inherit; color: inherit; }
 .song-lib-actions { display: flex; justify-content: flex-end; }
 .song-lib-lock { font-size: 12px; font-weight: 700; color: var(--muted); }
 
+/* ── Note-play mic gate ─────────────────────────────────────────────── */
+.play-status {
+  width: 100%; max-width: 470px;
+  min-height: 22px; margin: 10px 0;
+  text-align: center; font-size: 14px; line-height: 1.4;
+  color: var(--muted);
+}
+.play-status.ok { color: #276749; font-weight: 700; }
+.play-status.warn { color: #a34708; font-weight: 700; }
+.play-controls {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+  width: 100%; max-width: 470px; margin-bottom: 8px;
+}
+.gate-bar { flex-direction: column; }
+
 /* ── Weekly digest ──────────────────────────────────────────────────── */
 .digest-card {
   width: 100%; padding: 14px; margin-bottom: 18px;
@@ -1081,3 +1096,5 @@ button { font: inherit; color: inherit; }
 [data-theme="dark"] .song-lib-card.done { background: #172b22; border-color: #2f6b4b; }
 [data-theme="dark"] .plan-item-reason { color: #c2ccd8; }
 [data-theme="dark"] .plan-item-tag { color: #8ce0b3; }
+[data-theme="dark"] .play-status.warn { color: #f6ad55; }
+[data-theme="dark"] .play-status.ok { color: #8ce0b3; }

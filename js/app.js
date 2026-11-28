@@ -18,6 +18,11 @@
     lastWasFirst: false,
     tourSlide: 0,
     showReference: null,
+    micGatePassed: false,
+    gateBypassed: false,
+    countTimers: [],
+    countActive: false,
+    countBus: null,
     songSpeed: getSavedSongSpeed(),
     song: {
       active: false,
@@ -308,7 +313,7 @@
       html += '</div></section>';
     });
 
-    html += '<footer class="app-footer">Preludio Ukulele · v0.6 · © 2026 Eduardo de Farias Machado. All rights reserved. <a href="LICENSE">Licence</a> · <a href="THIRD_PARTY_NOTICES.md">Third-party notices</a></footer>';
+    html += '<footer class="app-footer">Preludio Ukulele · v0.7 · © 2026 Eduardo de Farias Machado. All rights reserved. <a href="LICENSE">Licence</a> · <a href="THIRD_PARTY_NOTICES.md">Third-party notices</a></footer>';
     html += '</div>';
     return html;
   }
@@ -643,6 +648,7 @@
     stopSong();
     stopCountIn();
     Practice.stopAll();
+    stopPlayGate();
     APP.showReference = null;
     APP.lessonId = id;
     APP.phase = 'present';
@@ -659,6 +665,7 @@
     stopSong();
     stopCountIn();
     Practice.stopAll();
+    stopPlayGate();
     APP.screen = 'map';
     APP.lessonId = null;
     APP.showReference = null;
@@ -905,10 +912,20 @@
     }
   }
 
+  function playStatusMessage() {
+    var state = MicGate.state().state;
+    if (state === 'heard') return 'Heard it! ✓';
+    if (state === 'playing') return 'Playing…';
+    if (state === 'missed') return 'I didn’t hear that note — try again, or continue below.';
+    if (state === 'unavailable') return 'Microphone unavailable — you can continue below.';
+    if (state === 'not-supported') return 'Microphone not available — you can continue below.';
+    if (state === 'listening') return 'Play it now — I’m listening…';
+    return 'Tap Start, then play along on the count.';
+  }
+
   function renderPlay(lesson) {
-    var diagram = isChord(lesson)
-      ? Graphics.chordDiagram(CURRICULUM.chords[lesson.chord], { showName: false })
-      : Graphics.fretboard(lesson.fret, lesson.string, t(lesson.note));
+    if (!isChord(lesson)) return renderNotePlay(lesson);
+    var diagram = Graphics.chordDiagram(CURRICULUM.chords[lesson.chord], { showName: false });
     return '<div class="lesson-body">' +
       '<div class="kicker">' + t('Your turn') + '</div>' +
       '<h1 class="lesson-title">' + esc(lessonTitle(lesson)) + '</h1>' +
@@ -920,11 +937,43 @@
       '<div class="action-bar"><button class="btn primary wide" data-action="complete-lesson">' + t('I played it') + '</button></div>';
   }
 
+  function renderNotePlay(lesson) {
+    var gate = MicGate.state();
+    var canConfirm = APP.micGatePassed || APP.gateBypassed;
+    var fallback = gate.state === 'missed' || gate.state === 'unavailable' || gate.state === 'not-supported';
+    var statusClass = gate.state === 'heard' ? ' ok' : (fallback ? ' warn' : '');
+    var diagram = Graphics.fretboard(lesson.fret, lesson.string, t(lesson.note));
+
+    var html = '<div class="lesson-body">';
+    html += '<div class="kicker">' + t('Your turn') + '</div>';
+    html += '<h1 class="lesson-title">' + esc(lessonTitle(lesson)) + '</h1>';
+    html += '<div class="diagram-wrap">' + diagram + '</div>';
+    html += '<p class="lesson-desc">' + esc(t(lesson.prompt)) + '</p>';
+    html += '<div class="play-status' + statusClass + '" id="play-status" role="status" aria-live="polite">' + esc(t(playStatusMessage())) + '</div>';
+    html += '<div class="play-controls">';
+    html += '<button class="btn secondary" data-action="hear">🔊 ' + t('Hear it') + '</button>';
+    if (!canConfirm) {
+      html += '<button class="btn secondary" data-action="play-start"' + (APP.countActive ? ' disabled' : '') + '>▶ ' +
+        esc(t(gate.state === 'idle' ? 'Start count-in' : 'Try again')) + '</button>';
+    }
+    html += '</div>';
+    html += '<p class="hint">' + t('Play the note after the count. We’ll listen for it.') + '</p>';
+    html += '</div>';
+    html += '<div class="action-bar gate-bar">';
+    html += '<button class="btn primary wide" data-action="play-confirm"' + (canConfirm ? '' : ' disabled') + '>' + t('I played it!') + '</button>';
+    if (fallback && !canConfirm) {
+      html += '<button class="btn secondary wide" data-action="play-confirm-anyway">' + t('Continue anyway') + '</button>';
+    }
+    return html + '</div>';
+  }
+
   function completeCurrentLesson() {
     var lesson = lessonById(APP.lessonId);
     if (!lesson) return;
+    if (!isChord(lesson) && !isSong(lesson) && !APP.micGatePassed && !APP.gateBypassed) return;
     stopSong();
     stopCountIn();
+    stopPlayGate();
     var stars = Math.max(1, 3 - APP.wrongCount);
     var result = Progress.completeLesson(lesson.id, stars);
     APP.lastStars = result.bestStars;
@@ -949,6 +998,61 @@
     html += '<button class="btn secondary wide" data-action="back-map">' + t('Back to map') + '</button>';
     html += '</div></div>';
     return html;
+  }
+
+  // ── NOTE-LESSON MIC GATE ────────────────────────────────────────────
+  function setPlayStatus(message, kind) {
+    var node = document.getElementById('play-status');
+    if (!node) return;
+    node.textContent = t(message);
+    node.className = 'play-status' + (kind ? ' ' + kind : '');
+  }
+
+  function stopPlayCountdown() {
+    APP.countTimers.forEach(function (id) { clearTimeout(id); });
+    APP.countTimers = [];
+    APP.countActive = false;
+    if (APP.countBus) { Audio.stopBus(APP.countBus); APP.countBus = null; }
+  }
+
+  function stopPlayGate() {
+    stopPlayCountdown();
+    MicGate.stop();
+    APP.micGatePassed = false;
+    APP.gateBypassed = false;
+  }
+
+  function startPlayCountdown(lesson, request) {
+    stopPlayCountdown();
+    APP.micGatePassed = false;
+    APP.gateBypassed = false;
+    var ctx = Audio.init();
+    if (!ctx) return;
+    APP.countActive = true;
+    APP.countBus = Audio.createBus();
+    var beat = 750;
+    var labels = ['Get ready…', '1…', '2…', '3…', '4…'];
+    labels.forEach(function (label, i) {
+      APP.countTimers.push(setTimeout(function () {
+        setPlayStatus(label);
+        if (i > 0) Audio.click(false, 0, APP.countBus);
+      }, i * beat));
+    });
+    APP.countTimers.push(setTimeout(function () {
+      setPlayStatus('Go!');
+      Audio.click(true, 0, APP.countBus);
+    }, 4 * beat));
+    APP.countTimers.push(setTimeout(function () {
+      APP.countActive = false;
+      Audio.stopBus(APP.countBus);
+      APP.countBus = null;
+      setPlayStatus('Play it now — I’m listening…');
+      MicGate.start(lesson, request, { onChange: function () {
+        if (MicGate.state().state === 'heard') APP.micGatePassed = true;
+        render(true);
+      } });
+    }, 4 * beat + 450));
+    render(true);
   }
 
   function hearCurrent() {
@@ -1302,8 +1406,17 @@
     else if (action === 'back-map') goMap();
     else if (action === 'goto-quiz') { stopSong(); stopCountIn(); APP.phase = 'quiz'; APP.quiz = null; APP.wrongCount = 0; render(); }
     else if (action === 'quiz-answer') { answerQuiz(target.getAttribute('data-value')); render(true); }
-    else if (action === 'goto-play') { stopSong(); stopCountIn(); APP.phase = 'play'; render(); }
+    else if (action === 'goto-play') { stopSong(); stopCountIn(); stopPlayGate(); APP.phase = 'play'; render(); }
     else if (action === 'complete-lesson') completeCurrentLesson();
+    else if (action === 'play-confirm') completeCurrentLesson();
+    else if (action === 'play-confirm-anyway') { APP.gateBypassed = true; completeCurrentLesson(); }
+    else if (action === 'play-start') {
+      var playLesson = lessonById(APP.lessonId);
+      if (playLesson && !isChord(playLesson) && !isSong(playLesson)) {
+        stopPlayGate();
+        startPlayCountdown(playLesson, MicGate.prewarm());
+      }
+    }
     else if (action === 'next-lesson') { var next = Progress.getNextLesson(); if (next) startLesson(next.id); else goMap(); }
     else if (action === 'hear') hearCurrent();
     else if (action === 'song-play' || action === 'song-replay' || action === 'song-hear') { playSong(lessonById(APP.lessonId)); }
@@ -1360,8 +1473,8 @@
     if (seconds >= 2) Progress.addPracticeSeconds(seconds);
     sessionStart = Date.now();
   }
-  window.addEventListener('pagehide', flushSession);
-  document.addEventListener('visibilitychange', function () { if (document.hidden) flushSession(); });
+  window.addEventListener('pagehide', function () { flushSession(); stopPlayGate(); });
+  document.addEventListener('visibilitychange', function () { if (document.hidden) { flushSession(); stopPlayGate(); } });
   setInterval(flushSession, 60000);
 
   window.PreludioHooks = {

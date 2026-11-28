@@ -15,7 +15,7 @@ test('index.html loads modules in dependency order', () => {
   const scripts = [...html.matchAll(/<script src="([^"]+)"/g)].map(m => m[1]);
   const expected = [
     'js/i18n.js', 'js/curriculum.js', 'js/progress.js', 'js/audio.js',
-    'js/graphics.js', 'js/practice.js', 'js/app.js'
+    'js/micgate.js', 'js/graphics.js', 'js/practice.js', 'js/app.js'
   ];
   assert.deepEqual(scripts, expected);
 });

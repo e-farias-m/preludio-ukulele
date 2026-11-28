@@ -1,6 +1,15 @@
 (function(){
   'use strict';
   var Audio={ctx:null,master:null,filter:null,ready:false};
+  function setAudioSession(type){
+    try{
+      if(typeof navigator!=='undefined' && navigator.audioSession && typeof navigator.audioSession.type!=='undefined'){
+        navigator.audioSession.type=type||'playback';
+      }
+    }catch(e){ /* unsupported */ }
+  }
+  function prepareForCapture(){ setAudioSession('play-and-record'); }
+  function restorePlayback(){ setAudioSession('playback'); }
   function ensureCtx(){
     if(Audio.ctx){
       if(Audio.ctx.state==='suspended' && Audio.ctx.resume) Audio.ctx.resume();
@@ -18,6 +27,7 @@
     Audio.master.connect(Audio.filter);
     Audio.filter.connect(Audio.ctx.destination);
     Audio.ready=true;
+    setAudioSession('playback');
     return Audio.ctx;
   }
   function pluck(freq,when,gain,dest){
@@ -112,7 +122,9 @@
     noteFreq:noteFreq,
     chordFreqs:chordFreqs,
     createBus:createBus,
-    stopBus:stopBus
+    stopBus:stopBus,
+    prepareForCapture:prepareForCapture,
+    restorePlayback:restorePlayback
   };
   if(typeof window!=='undefined') window.Audio=AudioAPI;
   if(typeof module!=='undefined' && module.exports) module.exports=AudioAPI;

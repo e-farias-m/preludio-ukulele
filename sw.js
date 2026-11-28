@@ -4,7 +4,7 @@
 
 'use strict';
 
-var CACHE = 'preludio-ukulele-v4';
+var CACHE = 'preludio-ukulele-v5';
 
 var ASSETS = [
   './',
@@ -15,6 +15,7 @@ var ASSETS = [
   './js/curriculum.js',
   './js/progress.js',
   './js/audio.js',
+  './js/micgate.js',
   './js/graphics.js',
   './js/practice.js',
   './js/app.js',
