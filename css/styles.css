@@ -1,4 +1,5 @@
 :root {
+  color-scheme: light;
   --bg: #f5f1eb;
   --surface: #fffdf9;
   --surface-2: #ffffff;
@@ -9,9 +10,9 @@
   --accent-soft: #e3f0fb;
   --accent-shadow: rgba(43, 108, 176, .22);
   --border: #e2d9cc;
-  --gold: #d69e2e;
-  --success: #2f855a;
-  --danger: #c53030;
+  --gold: #9A6E08;
+  --success: #14713F;
+  --danger: #C22B2B;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -96,7 +97,7 @@ button { font: inherit; color: inherit; }
 .course-progress { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
 .course-progress-track {
   flex: 1; height: 7px; border-radius: 99px;
-  background: #e4e9ef; overflow: hidden;
+  background: var(--border); overflow: hidden;
 }
 .course-progress-fill {
   height: 100%; border-radius: 99px;
@@ -169,7 +170,7 @@ button { font: inherit; color: inherit; }
 .unit-head h2 { font-size: 17px; font-weight: 800; letter-spacing: -.01em; }
 .unit-count { font-size: 12px; font-weight: 700; color: var(--muted); }
 .unit-sub { font-size: 12px; color: var(--muted); margin: 2px 0 8px; }
-.unit-bar { height: 5px; border-radius: 99px; background: #e4e9ef; overflow: hidden; margin-bottom: 12px; }
+.unit-bar { height: 5px; border-radius: 99px; background: var(--border); overflow: hidden; margin-bottom: 12px; }
 .unit-bar-fill { height: 100%; border-radius: 99px; background: var(--accent); transition: width .3s ease; }
 
 .lesson-list { display: flex; flex-direction: column; gap: 8px; }
@@ -230,7 +231,7 @@ button { font: inherit; color: inherit; }
   display: flex; flex-direction: column;
 }
 .lesson-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-.lesson-progress { flex: 1; height: 8px; border-radius: 99px; background: #e4e9ef; overflow: hidden; }
+.lesson-progress { flex: 1; height: 8px; border-radius: 99px; background: var(--border); overflow: hidden; }
 .lesson-progress-fill { height: 100%; border-radius: 99px; background: var(--accent); transition: width .3s ease; }
 
 .lesson-body {
@@ -503,7 +504,7 @@ button { font: inherit; color: inherit; }
   cursor: pointer;
   display: inline-flex; align-items: center; justify-content: center;
 }
-.btn-speed:hover:not(:disabled) { background: #d3e7f8; }
+.btn-speed:hover:not(:disabled) { background: var(--accent-soft); }
 .btn-speed:disabled { opacity: .4; cursor: not-allowed; }
 .song-speed-label {
   min-width: 86px;
@@ -1010,9 +1011,9 @@ button { font: inherit; color: inherit; }
   --accent-soft: #1b334d;
   --accent-shadow: rgba(121, 184, 240, .18);
   --border: #37465a;
-  --gold: #f0bd55;
-  --success: #6dd39a;
-  --danger: #ff8f8f;
+  --gold: #FFD166;
+  --success: #4FD98A;
+  --danger: #FF5A5A;
 }
 [data-theme="dark"] body { background: var(--bg); color: var(--fg); }
 [data-theme="dark"] .btn.primary,
