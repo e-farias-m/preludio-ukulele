@@ -4,12 +4,15 @@
 
 'use strict';
 
-var CACHE = 'preludio-ukulele-v5';
+var CACHE = 'preludio-ukulele-v6';
 
 var ASSETS = [
   './',
   './index.html',
   './manifest.json',
+  './icon.svg',
+  './logo.svg',
+  './logo-dark.svg',
   './css/styles.css',
   './js/i18n.js',
   './js/curriculum.js',

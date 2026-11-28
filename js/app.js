@@ -68,6 +68,7 @@
     try { return localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light'; }
     catch (e) { return 'light'; }
   }
+  function logoSrc() { return getSavedTheme() === 'dark' ? 'logo-dark.svg' : 'logo.svg'; }
   function setTheme(theme) {
     var value = theme === 'dark' ? 'dark' : 'light';
     try { localStorage.setItem(THEME_KEY, value); } catch (e) { /* ignore */ }
@@ -123,6 +124,12 @@
     if (!app) return;
     var skip = document.querySelector('.skip-link');
     if (skip) skip.textContent = t('Skip to content');
+    var fixedLogo = document.getElementById('app-logo-fixed');
+    if (fixedLogo) {
+      fixedLogo.style.display = (APP.screen === 'map' || APP.screen === 'first-sound') ? 'none' : 'block';
+      var src = logoSrc();
+      if (fixedLogo.getAttribute('src') !== src) fixedLogo.setAttribute('src', src);
+    }
     if (APP.screen === 'map') app.innerHTML = renderMap();
     else if (APP.screen === 'lesson') app.innerHTML = renderLesson();
     else if (APP.screen === 'first-sound') app.innerHTML = renderFirstSound();
@@ -233,7 +240,7 @@
 
     var html = '<div class="screen map-screen">';
     html += '<header class="app-header">';
-    html += '<div class="brand"><div class="brand-mark">♪</div><div><div class="brand-title">Preludio Ukulele</div><div class="brand-sub">gCEA · C6 tuning</div></div></div>';
+    html += '<div class="brand"><img class="brand-logo" src="' + logoSrc() + '" alt="Preludio Ukulele"><div class="brand-sub">gCEA · C6 tuning</div></div>';
     html += '<div class="header-actions">';
     html += '<button class="icon-btn" data-action="open-hub" aria-label="' + esc(t('Practice & tools')) + '">🎯</button>';
     html += '<button class="icon-btn" data-action="open-first-sound" aria-label="' + esc(t('First sounds')) + '">♪</button>';
@@ -313,7 +320,7 @@
       html += '</div></section>';
     });
 
-    html += '<footer class="app-footer">Preludio Ukulele · v0.7 · © 2026 Eduardo de Farias Machado. All rights reserved. <a href="LICENSE">Licence</a> · <a href="THIRD_PARTY_NOTICES.md">Third-party notices</a></footer>';
+    html += '<footer class="app-footer">Preludio Ukulele · v0.8 · © 2026 Eduardo de Farias Machado. All rights reserved. <a href="LICENSE">Licence</a> · <a href="THIRD_PARTY_NOTICES.md">Third-party notices</a></footer>';
     html += '</div>';
     return html;
   }
@@ -1309,7 +1316,7 @@
     var html = '<div class="screen first-sound-screen">';
     html += '<header class="app-header"><button class="icon-btn" data-action="close-first-sound" aria-label="' + esc(t('Back')) + '">←</button><div class="header-title">' + t('First sounds') + '</div><div class="header-spacer"></div></header>';
     html += '<div class="lesson-body">';
-    html += '<div class="first-sound-hero" aria-hidden="true">♪</div>';
+    html += '<div class="first-sound-hero"><img class="wordmark-logo-full" src="' + logoSrc() + '" alt="Preludio Ukulele"></div>';
     html += '<h1 class="lesson-title">' + t("Let's make your first sound") + '</h1>';
     html += '<p class="lesson-desc">' + t('A quick guide to holding, finding the strings, and strumming.') + '</p>';
     html += '<ol class="first-sound-steps">';

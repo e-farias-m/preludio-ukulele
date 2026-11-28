@@ -37,6 +37,17 @@ test('manifest describes an installable standalone app', () => {
   manifest.icons.forEach(i => assert.ok(fs.existsSync(path.join(root, i.src.replace(/^\.\//, ''))), i.src));
 });
 
+test('brand assets are available and cached', () => {
+  ['logo.svg', 'logo-dark.svg', 'icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png'].forEach(p => {
+    assert.ok(fs.existsSync(path.join(root, p)), p);
+  });
+  assert.match(html, /rel="icon" type="image\/svg\+xml" href="icon\.svg"/);
+  assert.match(html, /id="app-logo-fixed"/);
+  assert.ok(sw.includes("'./logo.svg'"));
+  assert.ok(sw.includes("'./logo-dark.svg'"));
+  assert.ok(sw.includes("'./icon.svg'"));
+});
+
 test('service worker caches every runtime asset', () => {
   const scripts = [...html.matchAll(/<script src="([^"]+)"/g)].map(m => m[1]);
   scripts.forEach(src => assert.ok(sw.includes(`'./${src}'`), `sw missing ${src}`));
