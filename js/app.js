@@ -320,7 +320,7 @@
       html += '</div></section>';
     });
 
-    html += '<footer class="app-footer">Preludio Ukulele · v0.8 · © 2026 Eduardo de Farias Machado. All rights reserved. <a href="LICENSE">Licence</a> · <a href="THIRD_PARTY_NOTICES.md">Third-party notices</a></footer>';
+    html += '<footer class="app-footer">Preludio Ukulele · v0.9 · © 2026 Eduardo de Farias Machado. All rights reserved. <a href="LICENSE">Licence</a> · <a href="THIRD_PARTY_NOTICES.md">Third-party notices</a></footer>';
     html += '</div>';
     return html;
   }

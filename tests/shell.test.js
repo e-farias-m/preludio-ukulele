@@ -43,6 +43,7 @@ test('brand assets are available and cached', () => {
   });
   assert.match(html, /rel="icon" type="image\/svg\+xml" href="icon\.svg"/);
   assert.match(html, /id="app-logo-fixed"/);
+  assert.match(html, /fonts\.googleapis\.com\/css2\?family=Outfit/);
   assert.ok(sw.includes("'./logo.svg'"));
   assert.ok(sw.includes("'./logo-dark.svg'"));
   assert.ok(sw.includes("'./icon.svg'"));
