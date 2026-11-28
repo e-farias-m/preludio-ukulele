@@ -8,12 +8,12 @@ Audit date: 2026-11-28.
 
 ### Outfit (web font)
 
-- Used for the application UI via the Google Fonts CSS API in `index.html`, and for the rasterised `UKULELE` label in `logo.svg` and `logo-dark.svg`.
+- Used only for the rasterised `UKULELE` label in `logo.svg` and `logo-dark.svg`. No font files are loaded by the app at runtime or bundled in this repository.
 - Designers: Smartsheet Inc. and Rodrigo Fuenzalida.
 - Copyright: 2021 The Outfit Project Authors (https://github.com/Outfitio/Outfit-Fonts).
 - Licence: SIL Open Font License 1.1 (full text below).
 - Source: https://fonts.google.com/specimen/Outfit
-- The font files are fetched from Google's servers at runtime and are not bundled in this repository. If you self-host the font files, this notice and the OFL text must accompany them.
+- The font was used to render the rasterised logo label; no font files are bundled in this repository. This notice and the OFL text accompany the artwork.
 
 ## 2. Images
 
