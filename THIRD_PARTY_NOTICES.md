@@ -13,8 +13,9 @@ None. The app uses the device's system font stack; no web fonts are loaded or bu
 ### Fretboard photograph (`images/instruments/fretboard.jpg`)
 
 - 800×313 JPEG, introduced in commit `60f6df3` ("Use provided fretboard photo") and cropped in `b794abe`.
-- No copyright metadata is embedded in the file, and no attribution or licence record was found in the repository history.
-- **Action required before commercial release:** confirm the origin of this photograph. If it was supplied or photographed by the Owner, no third-party licence applies and no attribution is needed. If it came from a third party, replace it with an original image or obtain the appropriate licence and add the required attribution here.
+- Origin confirmed by the Owner: **generated with Gemini**, inspired by a couple of reference photographs. It is not a copy of a third-party photograph.
+- No copyright metadata is embedded in the file. No third-party image licence or attribution obligation is identified.
+- As with other AI-generated artwork, copyright protection for the output may vary by jurisdiction; it is provided as-is and is not represented as third-party licensed material.
 
 ### Logo and app icons
 
